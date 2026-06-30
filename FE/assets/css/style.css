@@ -1,0 +1,291 @@
+@font-face {
+  font-family: "Segoe_UI";
+  src: url("../fonts/SegoeUIBlack-Italic.woff2") format("woff2"), url("../fonts/SegoeUIBlack-Italic.woff") format("woff");
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Segoe_UI";
+  src: url("../fonts/SegoeUI-LightItalic.woff2") format("woff2"), url("../fonts/SegoeUI-LightItalic.woff") format("woff");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Segoe_UI";
+  src: url("../fonts/SegoeUI-Semibold.woff2") format("woff2"), url("../fonts/SegoeUI-Semibold.woff") format("woff");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Segoe_UI";
+  src: url("../fonts/SegoeUI-SemiboldItalic.woff2") format("woff2"), url("../fonts/SegoeUI-SemiboldItalic.woff") format("woff");
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Segoe_UI Semilight";
+  src: url("../fonts/SegoeUI-SemilightItalic.woff2") format("woff2"), url("../fonts/SegoeUI-SemilightItalic.woff") format("woff");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Segoe_UI";
+  src: url("../fonts/SegoeUI-Italic.woff2") format("woff2"), url("../fonts/SegoeUI-Italic.woff") format("woff");
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Segoe_UI";
+  src: url("../fonts/SegoeUI.woff2") format("woff2"), url("../fonts/SegoeUI.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Segoe_UI";
+  src: url("../fonts/SegoeUI-Bold.woff2") format("woff2"), url("../fonts/SegoeUI-Bold.woff") format("woff");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Segoe_UI";
+  src: url("../fonts/SegoeUI-Light.woff2") format("woff2"), url("../fonts/SegoeUI-Light.woff") format("woff");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Segoe_UI";
+  src: url("../fonts/SegoeUI-BoldItalic.woff2") format("woff2"), url("../fonts/SegoeUI-BoldItalic.woff") format("woff");
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Segoe_UI Semilight";
+  src: url("../fonts/SegoeUI-Semilight.woff2") format("woff2"), url("../fonts/SegoeUI-Semilight.woff") format("woff");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Segoe_UI";
+  src: url("../fonts/SegoeUIBlack.woff2") format("woff2"), url("../fonts/SegoeUIBlack.woff") format("woff");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+/*======================================== config =================================*/
+*,
+*:before,
+*:after {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var, p,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video, input, textarea {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none !important;
+}
+
+a {
+  text-decoration: none;
+  transition: 0.3s all !important;
+  line-height: normal;
+  color: #012934;
+}
+a:hover, a:focus {
+  color: red;
+  text-decoration: none;
+}
+
+button, input[type=submit] {
+  cursor: pointer;
+  outline: none;
+  border-radius: 0;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #f8fafc;
+  color: #000000;
+  font-size: 15px;
+  line-height: 1.4;
+  font-weight: 400;
+  font-family: "Nunito Sans", sans-serif;
+}
+@media (max-width: 1023px) {
+  body {
+    font-size: 14px;
+  }
+}
+body.active-hidden {
+  overflow: hidden;
+}
+body img {
+  transition: 0.34s all !important;
+  max-width: 100%;
+  display: inline !important;
+}
+body h1, body h2, body h3, body h4, body h5 h6 {
+  line-height: 1.25 !important;
+}
+
+/*======================================== end config =================================*/
+.nav-menu li {
+  margin-bottom: 8px;
+}
+.nav-menu li:last-child {
+  margin-bottom: 0;
+}
+.nav-menu a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+  font-weight: bold;
+  padding: 16px 12px;
+  border-radius: 8px;
+}
+.nav-menu a svg {
+  width: 20px;
+  height: auto;
+}
+.nav-menu a svg rect, .nav-menu a svg path, .nav-menu a svg circle, .nav-menu a svg line {
+  fill: transparent;
+  stroke: white;
+}
+.nav-menu a.active {
+  background: #c5a85c !important;
+  color: #016b69 !important;
+}
+.nav-menu a.active svg rect, .nav-menu a.active svg path, .nav-menu a.active svg circle, .nav-menu a.active svg line {
+  fill: transparent;
+  stroke: #016b69;
+}
+.nav-menu a:hover {
+  background: rgba(255, 255, 255, 0.0784313725);
+}
+
+.btn-main {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #016b69;
+  color: #fff !important;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-weight: 600;
+  gap: 8px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 800;
+  background: linear-gradient(86.3deg, #279e9a 0%, #046669 68.75%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+.stat-icon svg {
+  display: inline-flex;
+  margin: 0 auto;
+}
+
+.link-more svg {
+  width: 12px;
+  height: auto;
+}
+
+.table-container {
+  width: 100%;
+}
+.table-container table {
+  width: 100%;
+  text-align: left;
+}
+.table-container table th {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 12px 16px;
+  background: #f8fafc;
+  color: #016b69;
+}
+.table-container tr td {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 16px 16px;
+  background: #fff;
+}
+.table-container .name {
+  font-weight: bold;
+}
+.table-container .list-badge {
+  font-size: 12px;
+  font-style: italic;
+}
+
+.more-single {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  padding: 4px 8px;
+}
+.more-single:hover {
+  color: #fff;
+  background: #016b69;
+}
+
+.item-tab {
+  cursor: pointer;
+}
+.item-tab.active, .item-tab:hover {
+  background: #016b69;
+  color: #fff;
+  border-color: #016b69;
+}
+
+.block-evaluate .desc-eval {
+  display: none;
+}
+
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+}
+
+.desc-single p {
+  margin-bottom: 12px;
+}
+.desc-single p:last-child {
+  margin-bottom: 0;
+}
+
+/*# sourceMappingURL=style.css.map */

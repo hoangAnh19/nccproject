@@ -1,0 +1,383 @@
+@font-face {
+  font-family: "SVN-Segoe UI";
+  src: url("../fonts/SVN-SegoeULightItalic.woff2") format("woff2"), url("../fonts/SVN-SegoeULightItalic.woff") format("woff");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SVN-Segoe UI";
+  src: url("../fonts/SVN-SegoeULight.woff2") format("woff2"), url("../fonts/SVN-SegoeULight.woff") format("woff");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SVN-Segoe UI";
+  src: url("../fonts/SVN-SegoeUI.woff2") format("woff2"), url("../fonts/SVN-SegoeUI.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SVN-Segoe UI";
+  src: url("../fonts/SVN-SegoeUIBoldItalic.woff2") format("woff2"), url("../fonts/SVN-SegoeUIBoldItalic.woff") format("woff");
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SVN-Segoe UI";
+  src: url("../fonts/SVN-SegoeUIBold.woff2") format("woff2"), url("../fonts/SVN-SegoeUIBold.woff") format("woff");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SVN-Segoe UI Condensed";
+  src: url("../fonts/SVN-SegoeUICondensedBold.woff2") format("woff2"), url("../fonts/SVN-SegoeUICondensedBold.woff") format("woff");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SVN-Segoe UI Condensed";
+  src: url("../fonts/SVN-SegoeUICondensed.woff2") format("woff2"), url("../fonts/SVN-SegoeUICondensed.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SVN-Segoe UI";
+  src: url("../fonts/SVN-SegoeUIItalic.woff2") format("woff2"), url("../fonts/SVN-SegoeUIItalic.woff") format("woff");
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+.text-gradient {
+  background: linear-gradient(86.3deg, #986300 0%, #EBBB6D 68.75%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+/*======================================== config =================================*/
+*,
+*:before,
+*:after {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+p,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video,
+input,
+textarea {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none !important;
+}
+
+a {
+  text-decoration: none;
+  transition: 0.3s all !important;
+  line-height: normal;
+  color: #000000;
+}
+a:hover, a:focus {
+  color: #0069C6;
+  text-decoration: none;
+}
+
+button,
+input[type=submit] {
+  cursor: pointer;
+  outline: none;
+  border-radius: 0;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #FFF9EB;
+  color: #000000;
+  font-size: 16px;
+  line-height: 1.35;
+  font-family: "SVN-Segoe UI";
+}
+@media (max-width: 1440px) {
+  body {
+    font-size: 18px;
+  }
+}
+@media (max-width: 1280px) {
+  body {
+    font-size: 16px;
+  }
+}
+@media (max-width: 1023px) {
+  body {
+    font-size: 14px;
+  }
+}
+body.active {
+  overflow: hidden;
+}
+body img {
+  transition: 0.34s all !important;
+  max-width: 100%;
+  display: inline !important;
+}
+body h1, body h2, body h3, body h4, body h5, body h6 {
+  font-weight: 500;
+}
+body h2 {
+  font-size: 46px;
+}
+body h3 {
+  font-size: 28px;
+}
+body h4 {
+  font-size: 24px;
+}
+body h5 {
+  font-size: 20px;
+}
+
+.container {
+  max-width: 1456px !important;
+  margin: 0 auto;
+  padding: 0 80px;
+}
+@media (max-width: 1472px) {
+  .container {
+    max-width: 100% !important;
+    padding: 0 100px;
+  }
+}
+@media (max-width: 1280px) {
+  .container {
+    padding: 0 60px;
+  }
+}
+@media (max-width: 1023px) {
+  .container {
+    padding: 0 40px;
+  }
+}
+@media (max-width: 767px) {
+  .container {
+    padding: 0 20px;
+  }
+}
+
+/*======================================== end config =================================*/
+.playfair {
+  font-family: "Playfair Display", serif;
+}
+
+.padd-main {
+  padding: 120px 0;
+}
+
+.btn-main {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 0 32px;
+  height: 54px;
+  border-radius: 54px;
+  border: 1px solid #fff;
+  font-weight: 500;
+}
+.btn-main svg {
+  transition: 0.3s all !important;
+  position: relative;
+  right: 0;
+}
+.btn-main:hover svg {
+  right: -4px;
+}
+.btn-main:hover svg path {
+  stroke: #fff;
+}
+
+.title {
+  margin-bottom: 40px;
+}
+.title h2 {
+  font-size: 46px;
+  font-weight: 500;
+}
+
+.h-menu ul {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+}
+.h-menu a {
+  color: #fff;
+}
+
+.item-solution {
+  transition: 0.4s all !important;
+}
+.item-solution .avarta:after {
+  content: "";
+  width: calc(100% + 20px);
+  height: calc(100% + 20px);
+  border-radius: 153px;
+  border: 1px solid #008750;
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  transition: 0.4s all !important;
+  transform: scale(0.8);
+}
+.item-solution .avarta:before {
+  content: "";
+  width: calc(100% - 20px);
+  height: calc(100% - 20px);
+  transition: 0.4s all !important;
+  background: rgba(0, 135, 80, 0.3019607843);
+  z-index: 3;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  border-radius: 153px;
+  transform: scale(1.2);
+  opacity: 0;
+}
+.item-solution .avarta img {
+  position: relative;
+  z-index: 2;
+  border-radius: 153px;
+}
+.item-solution:hover .avarta:after {
+  transform: scale(1);
+}
+.item-solution:hover .avarta:before {
+  opacity: 1;
+  transform: scale(1);
+}
+.item-solution:hover h4 {
+  color: #008750;
+}
+
+.box-principle {
+  background: url("../images/bg-principle.png") no-repeat center;
+  background-size: cover;
+}
+
+.block-faq .item-faq {
+  border-bottom: 1px dashed rgba(232, 196, 116, 0.5019607843);
+}
+.block-faq p {
+  margin-bottom: 12px;
+}
+.block-faq p:last-child {
+  margin-bottom: 0;
+}
+
+.swiper-pagination {
+  position: relative;
+  margin-top: 40px;
+  bottom: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.swiper-pagination span {
+  width: 12px;
+  height: 12px;
+  background: #008750;
+  opacity: 0.3;
+  margin: 0 8px !important;
+}
+.swiper-pagination span.swiper-pagination-bullet-active {
+  opacity: 1;
+}
+
+/*# sourceMappingURL=stylle.css.map */

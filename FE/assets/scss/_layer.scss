@@ -1,0 +1,38 @@
+.nav-menu {
+  li {
+    margin-bottom: 8px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #fff;
+    font-weight: bold;
+    padding: 16px 12px;
+    border-radius: 8px;
+    svg {
+      width: 20px;
+      height: auto;
+      rect, path, circle, line {
+        fill: transparent;
+        stroke: white;
+      }
+    }
+    &.active {
+      background: #c5a85c !important;
+      color: $blue !important;
+      svg {
+        rect, path, circle, line {
+          fill: transparent;
+          stroke: $blue;
+        }
+      }
+    }
+    &:hover {
+      background: #ffffff14;
+    }
+  }
+}
