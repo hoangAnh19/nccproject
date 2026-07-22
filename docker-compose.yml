@@ -9,7 +9,7 @@ services:
       MYSQL_USER: ncc_user
       MYSQL_PASSWORD: ncc_pass
     ports:
-      - "13306:3306"
+      - "9300:3306"
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:
