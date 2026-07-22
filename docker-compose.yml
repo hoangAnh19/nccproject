@@ -34,24 +34,24 @@ services:
       DB_PASSWORD: ncc_pass
       DB_NAME: ncc_db
       DB_SYNC: "true"
-      WEB_ORIGIN: http://localhost:9100
+      WEB_ORIGIN: ${WEB_PUBLIC_URL:-http://localhost:9100}
     ports:
-      - "9200:3001"
+      - "${API_PORT:-9200}:3001"
 
   web:
     build:
       context: ./apps/web
       args:
-        NEXT_PUBLIC_API_URL: http://localhost:9200
+        NEXT_PUBLIC_API_URL: ${API_PUBLIC_URL:-http://localhost:9200}
     container_name: ncc_web
     restart: unless-stopped
     depends_on:
       - api
     environment:
       API_URL: http://api:3001
-      NEXT_PUBLIC_API_URL: http://localhost:9200
+      NEXT_PUBLIC_API_URL: ${API_PUBLIC_URL:-http://localhost:9200}
     ports:
-      - "9100:3000"
+      - "${WEB_PORT:-9100}:3000"
 
 volumes:
   mysql-data:

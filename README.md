@@ -1,6 +1,6 @@
 # Đánh giá chất lượng nhà cung cấp CNTT
 
-Ứng dụng web quản lý nhà cung cấp, cấu hình bộ tiêu chí đánh giá, chấm điểm, xếp hạng và báo cáo tổng quan. Luồng chính dùng API và MySQL thật, không có mock fallback khi API lỗi.
+Ứng dụng web quản lý nhà cung cấp, cấu hình bộ tiêu chí đánh giá, chấm điểm, xếp hạng và báo cáo tổng quan.
 
 ## Kiến trúc
 
@@ -8,21 +8,38 @@
 - `apps/api`: NestJS, TypeScript, TypeORM, class-validator
 - `docker-compose.yml`: MySQL, API, Web
 
-## Chạy bằng Docker
+## Chạy Docker local
+
+Không cần tạo `.env`; compose sẽ mặc định dùng localhost.
 
 ```bash
-docker compose up --build
+docker compose up --build -d
 ```
 
 - Web local: http://localhost:9100
 - API local: http://localhost:9200
-- Web server: http://13.212.248.168:9100
-- API server: http://13.212.248.168:9200
 - MySQL: localhost:13306
 
-API container kết nối MySQL bằng service name `mysql`. Web container dùng `API_URL=http://api:3001` cho server-side và `NEXT_PUBLIC_API_URL=http://13.212.248.168:9200` cho browser.
+## Deploy server
 
-## Chạy local
+Server IP hiện tại: `13.212.248.168`.
+
+```bash
+cp .env.server.example .env
+docker compose up --build -d
+```
+
+- Web server: http://13.212.248.168:9100
+- API server: http://13.212.248.168:9200
+
+Nếu đổi IP/domain, chỉ cần sửa `.env`:
+
+```env
+WEB_PUBLIC_URL=http://your-domain-or-ip:9100
+API_PUBLIC_URL=http://your-domain-or-ip:9200
+```
+
+## Chạy local không Docker
 
 Yêu cầu Node.js 20+ và MySQL đang chạy.
 
@@ -33,7 +50,7 @@ cp apps/web/.env.example apps/web/.env.local
 npm run dev
 ```
 
-Biến môi trường API:
+Biến môi trường API local:
 
 - `PORT=3001`
 - `DB_HOST=localhost`
@@ -42,7 +59,7 @@ Biến môi trường API:
 - `DB_PASSWORD=ncc_pass`
 - `DB_NAME=ncc_db`
 - `DB_SYNC=true`
-- `WEB_ORIGIN=http://13.212.248.168:9100`
+- `WEB_ORIGIN=http://localhost:9100`
 
 ## Seed data
 
@@ -55,6 +72,12 @@ Khi database trống, API tự seed:
 - 14 tiêu chí con
 - Thang điểm 1-5
 - Rank A/B/C/D: 85-100, 70-84.99, 55-69.99, 0-54.99
+
+Seed bổ sung 30 nhà cung cấp và các kỳ 2025/2026:
+
+```bash
+docker compose exec -T mysql mysql -uncc_user -pncc_pass ncc_db < database/seed-extra-30-suppliers-evaluations.sql
+```
 
 ## Endpoint chính
 
@@ -86,16 +109,16 @@ Khi database trống, API tự seed:
 
 ## Kiểm tra
 
+Local:
+
 ```bash
-npm run build
-docker compose up --build
 curl http://localhost:9200/health
 curl http://localhost:9200/suppliers
 curl http://localhost:9200/evaluation-configs/default/form-schema
 curl http://localhost:9200/reports/summary
 ```
 
-Khi kiểm tra từ máy khác:
+Server:
 
 ```bash
 curl http://13.212.248.168:9200/health
