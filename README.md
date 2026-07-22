@@ -14,11 +14,13 @@
 docker compose up --build
 ```
 
-- Web: http://localhost:13000
-- API: http://localhost:13001
+- Web local: http://localhost:9100
+- API local: http://localhost:9200
+- Web server: http://13.212.248.168:9100
+- API server: http://13.212.248.168:9200
 - MySQL: localhost:13306
 
-API container kết nối MySQL bằng service name `mysql`. Web container dùng `API_URL=http://api:3001` cho server-side proxy và `NEXT_PUBLIC_API_URL=http://localhost:13001` cho browser.
+API container kết nối MySQL bằng service name `mysql`. Web container dùng `API_URL=http://api:3001` cho server-side và `NEXT_PUBLIC_API_URL=http://13.212.248.168:9200` cho browser.
 
 ## Chạy local
 
@@ -40,7 +42,7 @@ Biến môi trường API:
 - `DB_PASSWORD=ncc_pass`
 - `DB_NAME=ncc_db`
 - `DB_SYNC=true`
-- `WEB_ORIGIN=http://localhost:13000`
+- `WEB_ORIGIN=http://13.212.248.168:9100`
 
 ## Seed data
 
@@ -87,8 +89,14 @@ Khi database trống, API tự seed:
 ```bash
 npm run build
 docker compose up --build
-curl http://localhost:13001/health
-curl http://localhost:13001/suppliers
-curl http://localhost:13001/evaluation-configs/default/form-schema
-curl http://localhost:13001/reports/summary
+curl http://localhost:9200/health
+curl http://localhost:9200/suppliers
+curl http://localhost:9200/evaluation-configs/default/form-schema
+curl http://localhost:9200/reports/summary
+```
+
+Khi kiểm tra từ máy khác:
+
+```bash
+curl http://13.212.248.168:9200/health
 ```
