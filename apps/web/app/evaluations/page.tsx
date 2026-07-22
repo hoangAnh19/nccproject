@@ -11,6 +11,27 @@ type Scores = Record<string, { score: number; note: string }>;
 const includesText = (value: string | undefined | null, query: string) =>
   (value ?? '').toLowerCase().includes(query.toLowerCase().trim());
 
+function groupCriteriaByLayer(criteria: EvaluationConfig['groups'][number]['criteria']) {
+  const layers = new Map<
+    string,
+    {
+      code: string;
+      name: string;
+      criteria: EvaluationConfig['groups'][number]['criteria'];
+    }
+  >();
+
+  criteria.forEach((criterion) => {
+    const code = criterion.layer1Code ?? criterion.code.split('.')[0];
+    const name = criterion.layer1Name ?? 'Nhóm tiêu chí';
+    const current = layers.get(code) ?? { code, name, criteria: [] };
+    current.criteria.push(criterion);
+    layers.set(code, current);
+  });
+
+  return [...layers.values()];
+}
+
 export default function EvaluationsPage() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [config, setConfig] = useState<EvaluationConfig | null>(null);
@@ -214,38 +235,57 @@ export default function EvaluationsPage() {
                 <span className="text-sm text-slate-600">Trọng số nhóm {group.weight}%</span>
               </div>
               <div className="divide-y divide-line">
-                {group.criteria.map((criterion) => (
-                  <div key={criterion.id} className="grid gap-3 px-4 py-3 lg:grid-cols-[1fr_220px_1fr]">
-                    <div>
-                      <div className="font-medium text-ink">
-                        {criterion.code}. {criterion.name}
-                      </div>
-                      <div className="text-xs text-slate-500">Trọng số tiêu chí {criterion.weight}%</div>
+                {groupCriteriaByLayer(group.criteria).map((layer) => (
+                  <div key={layer.code}>
+                    <div className="bg-slate-50 px-4 py-3 text-sm font-semibold text-ink">
+                      {layer.code}. {layer.name}
                     </div>
-                    <select
-                      value={scores[criterion.id]?.score ?? config.scaleMin}
-                      onChange={(event) =>
-                        setScores({
-                          ...scores,
-                          [criterion.id]: { ...scores[criterion.id], score: Number(event.target.value) },
-                        })
-                      }
-                      className="focus-ring rounded-md border border-line px-3 py-2 text-sm"
-                    >
-                      {config.scoreOptions.map((option) => (
-                        <option key={option.id} value={option.value}>
-                          {option.value} - {option.label}
-                        </option>
+                    <div className="divide-y divide-line">
+                      {layer.criteria.map((criterion) => (
+                        <div key={criterion.id} className="grid gap-3 px-4 py-3 lg:grid-cols-[1fr_220px_1fr]">
+                          <div>
+                            <div className="font-medium text-ink">
+                              {criterion.code}. {criterion.name}
+                            </div>
+                            <div className="mt-1 text-xs text-slate-500">
+                              Trọng số {formatScore(criterion.weight)}% · Áp dụng: {criterion.applicableType ?? 'Tất cả'}
+                            </div>
+                            {criterion.description && (
+                              <div className="mt-2 whitespace-pre-line text-xs leading-5 text-slate-600">
+                                {criterion.description}
+                              </div>
+                            )}
+                          </div>
+                          <select
+                            value={scores[criterion.id]?.score ?? config.scaleMin}
+                            onChange={(event) =>
+                              setScores({
+                                ...scores,
+                                [criterion.id]: { ...scores[criterion.id], score: Number(event.target.value) },
+                              })
+                            }
+                            className="focus-ring rounded-md border border-line px-3 py-2 text-sm"
+                          >
+                            {config.scoreOptions.map((option) => (
+                              <option key={option.id} value={option.value}>
+                                {option.value} - {option.label}
+                              </option>
+                            ))}
+                          </select>
+                          <input
+                            value={scores[criterion.id]?.note ?? ''}
+                            onChange={(event) =>
+                              setScores({
+                                ...scores,
+                                [criterion.id]: { ...scores[criterion.id], note: event.target.value },
+                              })
+                            }
+                            placeholder="Ghi chú tiêu chí"
+                            className="focus-ring rounded-md border border-line px-3 py-2 text-sm"
+                          />
+                        </div>
                       ))}
-                    </select>
-                    <input
-                      value={scores[criterion.id]?.note ?? ''}
-                      onChange={(event) =>
-                        setScores({ ...scores, [criterion.id]: { ...scores[criterion.id], note: event.target.value } })
-                      }
-                      placeholder="Ghi chú tiêu chí"
-                      className="focus-ring rounded-md border border-line px-3 py-2 text-sm"
-                    />
+                    </div>
                   </div>
                 ))}
               </div>

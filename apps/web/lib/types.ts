@@ -30,6 +30,11 @@ export type Criterion = {
   code: string;
   name: string;
   description?: string;
+  layer1Code?: string;
+  layer1Name?: string;
+  applicableType?: string;
+  reference?: string;
+  source?: string;
   weight: number;
   sortOrder?: number;
   isActive?: boolean;

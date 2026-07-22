@@ -169,6 +169,21 @@ export class EvaluationCriterion {
   @Column({ type: 'text', nullable: true })
   description?: string;
 
+  @Column({ type: 'varchar', length: 40, nullable: true })
+  layer1Code?: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  layer1Name?: string;
+
+  @Column({ type: 'varchar', length: 120, nullable: true })
+  applicableType?: string;
+
+  @Column({ type: 'text', nullable: true })
+  reference?: string;
+
+  @Column({ type: 'text', nullable: true })
+  source?: string;
+
   @Column({ type: 'double', default: 0 })
   weight: number;
 

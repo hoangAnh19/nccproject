@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="731" uniqueCount="422"><si><t>BỘ TIÊU CHÍ ĐÁNH GIÁ NHÀ CUNG CẤP CNTT – NGÂN HÀNG</t></si><si><t>(Căn cứ: Luật Đấu thầu 22/2023/QH15, Nghị định 214/2025/NĐ-CP, QĐ BIDV 321 và các quy định hiện hành | Phiên bản v2.0)</t></si><si><t>MỤC ĐÍCH</t></si><si><t>CẤU TRÚC</t></si><si><t xml:space="preserve">  Sheet A</t></si><si><t>A – Uy tín nhà cung cấp  (Trọng số: 25%)</t></si><si><t xml:space="preserve">  Sheet B</t></si><si><t>B – Năng lực nhà cung cấp  (Trọng số: 30%)</t></si><si><t xml:space="preserve">  Sheet C</t></si><si><t xml:space="preserve">  Sheet D</t></si><si><t>D – Phát triển bền vững ESG  (Trọng số: 15%)</t></si><si><t xml:space="preserve">  Sheet TỔNG HỢP</t></si><si><t>Kết quả đánh giá tổng thể &amp; phân loại nhà cung cấp</t></si><si><t>KÝ HIỆU TIÊU CHÍ</t></si><si><t xml:space="preserve">  [NCC]</t></si><si><t>Tiêu chí đánh giá về chủ thể nhà cung cấp</t></si><si><t xml:space="preserve">  [SP]</t></si><si><t>Tiêu chí đánh giá về sản phẩm hàng hóa được cung cấp</t></si><si><t xml:space="preserve">  [DV]</t></si><si><t>Tiêu chí đánh giá về dịch vụ được cung cấp</t></si><si><t xml:space="preserve">  [SP/DV]</t></si><si><t>Tiêu chí đánh giá về cả sản phẩm và dịch vụ</t></si><si><t>THANG ĐIỂM LAYER 2</t></si><si><t xml:space="preserve">  1 điểm</t></si><si><t>Không đạt / Không có thông tin</t></si><si><t xml:space="preserve">  2 điểm</t></si><si><t>Dưới mức yêu cầu tối thiểu</t></si><si><t xml:space="preserve">  3 điểm</t></si><si><t>Đạt yêu cầu cơ bản</t></si><si><t xml:space="preserve">  4 điểm</t></si><si><t>Tốt – Vượt yêu cầu cơ bản</t></si><si><t xml:space="preserve">  5 điểm</t></si><si><t>Xuất sắc – Vượt trội so với yêu cầu</t></si><si><t>LOẠI HÌNH ÁP DỤNG</t></si><si><t xml:space="preserve">  Hàng hóa</t></si><si><t>Mua sắm thiết bị, phần cứng, bản quyền phần mềm, v.v.</t></si><si><t xml:space="preserve">  TV</t></si><si><t>Dịch vụ tư vấn (tư vấn kiểm toán, tư vấn lập dự án, v.v.)</t></si><si><t xml:space="preserve">  PTV</t></si><si><t>Dịch vụ phi tư vấn (bảo trì, vận hành, hosting, SaaS, v.v.)</t></si><si><t>CỘT TÀI LIỆU THAM CHIẾU</t></si><si><t>CỘT NGUỒN TIN / CÁCH THỨC KHẢO SÁT</t></si><si><t xml:space="preserve">  ① Chủ động đánh giá</t></si><si><t>Người khảo sát quan sát thực tế, kiểm tra hiện trường, phỏng vấn, đối chiếu hồ sơ/biên bản nội bộ BIDV</t></si><si><t xml:space="preserve">  ② Hồ sơ dự thầu/đề xuất</t></si><si><t>Thông tin do nhà cung cấp cung cấp trong HSDT/HSĐX khi tham gia LCNT/LCNCC</t></si><si><t xml:space="preserve">  ③ Cập nhật từ NCC</t></si><si><t>Văn bản, báo cáo, chứng nhận do nhà cung cấp chủ động cung cấp/cập nhật định kỳ trong quá trình hợp tác</t></si><si><t xml:space="preserve">  ④ Thông tin công khai</t></si><si><t>Nguồn chính thống công bố công khai, có dẫn link cụ thể, ví dụ:</t></si><si><t xml:space="preserve">     • Đấu thầu</t></si><si><t>Cổng đấu thầu quốc gia: https://muasamcong.mpi.gov.vn/web/guest/organizations-violators</t></si><si><t xml:space="preserve">     • Doanh nghiệp</t></si><si><t>Cổng ĐKKD quốc gia: https://dangkykinhdoanh.gov.vn</t></si><si><t xml:space="preserve">     • Thuế</t></si><si><t>Tổng cục Thuế: https://www.gdt.gov.vn</t></si><si><t xml:space="preserve">     • Tòa án</t></si><si><t>Cổng thông tin điện tử TANDTC: https://congbobanan.toaan.gov.vn</t></si><si><t xml:space="preserve">     • Tín dụng (CIC)</t></si><si><t>Trung tâm Thông tin Tín dụng Quốc gia: https://cic.org.vn (qua đầu mối QLRR/QHKH)</t></si><si><t xml:space="preserve">     • Chứng chỉ ISO</t></si><si><t>IAF CertSearch: https://www.iafcertsearch.org</t></si><si><t xml:space="preserve">     • Đánh giá ESG</t></si><si><t>EcoVadis: https://ecovadis.com | CDP: https://www.cdp.net</t></si><si><t xml:space="preserve">     • Phân tích thị trường</t></si><si><t>Gartner: https://www.gartner.com | IDC: https://www.idc.com</t></si><si><t>PHÂN LOẠI KẾT QUẢ</t></si><si><t xml:space="preserve">  Loại A (≥85 điểm)</t></si><si><t>Nhà cung cấp chiến lược – Ưu tiên hợp tác dài hạn 3–5 năm</t></si><si><t xml:space="preserve">  Loại B (70–84 điểm)</t></si><si><t>Nhà cung cấp đủ điều kiện – Tiếp tục hợp tác, đánh giá lại hàng năm</t></si><si><t xml:space="preserve">  Loại C (55–69 điểm)</t></si><si><t>Cần cải thiện – Giám sát chặt, giới hạn khối lượng</t></si><si><t xml:space="preserve">  Loại D (&lt; 55 điểm)</t></si><si><t>Yếu kém – Xem xét chấm dứt, không phê duyệt hợp đồng mới</t></si><si><t>A – UY TÍN NHÀ CUNG CẤP</t></si><si><t>Trọng số tổng thể: 25%  |  Điểm tối đa: 100  |  [NCC]=Nhà cung cấp  [SP]=Sản phẩm  [DV]=Dịch vụ</t></si><si><t>#</t></si><si><t>Mã L1</t></si><si><t>Tiêu chí Layer 1</t></si><si><t>Tiêu chí Layer 2 &amp; Thang điểm</t></si><si><t>Loại hình
+áp dụng</t></si><si><t>Điểm
+(1–5)</t></si><si><t>Trọng số
+(%)</t></si><si><t>Điểm
+quy đổi</t></si><si><t>Tài liệu căn cứ &amp; Tham chiếu</t></si><si><t>Nguồn tin / Cách thức khảo sát</t></si><si><t>A1</t></si><si><t>[Layer 1]
+Tư cách pháp lý &amp; Hồ sơ pháp nhân</t></si><si><t>[A1.1] Giấy phép đăng ký kinh doanh
+→ Có giấy phép kinh doanh hợp lệ, ngành nghề phù hợp với hàng hóa/dịch vụ cung cấp</t></si><si><t>Hàng hóa, TV, PTV</t></si><si><t>• Luật Doanh nghiệp số 59/2020/QH14 – Tư cách pháp nhân
+  https://thuvienphapluat.vn/van-ban/Doanh-nghiep/Luat-Doanh-nghiep-2020-428454.aspx
+• Luật Đấu thầu số 22/2023/QH15 (sửa đổi 2024)
+  https://thuvienphapluat.vn/van-ban/Dau-tu/Luat-Dau-thau-2023-22-2023-QH15-521746.aspx</t></si><si><t>④ Thông tin công khai – Cổng thông tin quốc gia về đăng ký doanh nghiệp
+https://dangkykinhdoanh.gov.vn
+② Thông tin tại Hồ sơ dự thầu/Hồ sơ đề xuất
+(HSDT/HSĐX do nhà cung cấp nộp khi tham gia LCNT/LCNCC)</t></si><si><t>[A1.2] Tư cách hợp lệ theo Luật Đấu thầu (Điều 5)
+→ Không thuộc danh sách bị cấm tham dự; không vi phạm khoản 1 Điều 20 NĐ214</t></si><si><t>• Luật Đấu thầu số 22/2023/QH15 (sửa đổi 2024)
+  https://thuvienphapluat.vn/van-ban/Dau-tu/Luat-Dau-thau-2023-22-2023-QH15-521746.aspx
+• Nghị định 214/2025/NĐ-CP hướng dẫn Luật Đấu thầu
+  https://thuvienphapluat.vn/van-ban/Dau-tu/Nghi-dinh-214-2025-ND-CP</t></si><si><t>④ Thông tin công khai – CSDL quốc gia về nhà thầu (Điều 19 NĐ214)
+https://muasamcong.mpi.gov.vn
+② Thông tin tại Hồ sơ dự thầu/Hồ sơ đề xuất
+(HSDT/HSĐX do nhà cung cấp nộp khi tham gia LCNT/LCNCC)</t></si><si><t>[A1.3] Thời gian hoạt động trong ngành CNTT
+→ ≥5 năm: 5đ | 3–5 năm: 4đ | 1–3 năm: 3đ | &lt;1 năm: 1đ</t></si><si><t>• Quy chế BIDV số 321/QĐ-BIDV – Đầu tư mua sắm thuê TS CNTT
+  Nội bộ BIDV – B.ONE</t></si><si><t>[A1.4] Tình trạng hoạt động liên tục (không phá sản/giải thể)
+→ Đang hoạt động ổn định, không có lịch sử phá sản/tái cơ cấu do thua lỗ</t></si><si><t>④ Thông tin công khai – Cổng thông tin quốc gia về đăng ký doanh nghiệp
+https://dangkykinhdoanh.gov.vn
+① Người khảo sát chủ động đánh giá
+(quan sát thực tế, kiểm tra hiện trường, phỏng vấn, đối chiếu hồ sơ nội bộ BIDV)</t></si><si><t>[A1.5] Chứng nhận/phê duyệt của cơ quan quản lý ngành
+→ Có đủ chứng chỉ hành nghề, phê duyệt của NHNN/Bộ TTTT theo loại hàng hóa/dịch vụ</t></si><si><t>• Thông tư 09/2020/TT-NHNN – An ninh thông tin ngân hàng
+  https://thuvienphapluat.vn/van-ban/Tien-te-Ngan-hang/Thong-tu-09-2020-TT-NHNN
+• Thông tư 40/2020/TT-BTTTT – Ưu tiên sản phẩm CNTT trong nước
+  https://thuvienphapluat.vn/van-ban/Cong-nghe-thong-tin/Thong-tu-40-2020-TT-BTTTT</t></si><si><t>② Thông tin tại Hồ sơ dự thầu/Hồ sơ đề xuất
+(HSDT/HSĐX do nhà cung cấp nộp khi tham gia LCNT/LCNCC)
+③ Thông tin cập nhật từ nhà cung cấp
+(văn bản, báo cáo, chứng nhận do NCC chủ động cung cấp/cập nhật định kỳ)</t></si><si><t>[A1.6] Cấu trúc sở hữu &amp; quản trị doanh nghiệp
+→ Cơ cấu sở hữu minh bạch, rõ ràng, không có xung đột lợi ích với ngân hàng</t></si><si><t>• Luật Doanh nghiệp số 59/2020/QH14 – Tư cách pháp nhân
+  https://thuvienphapluat.vn/van-ban/Doanh-nghiep/Luat-Doanh-nghiep-2020-428454.aspx
+• Quy chế BIDV số 321/QĐ-BIDV – Đầu tư mua sắm thuê TS CNTT
+  Nội bộ BIDV – B.ONE</t></si><si><t>A2</t></si><si><t>[Layer 1]
+Lịch sử vi phạm &amp; Kỷ luật đấu thầu</t></si><si><t>[A2.1] Lịch sử vi phạm trong 3 năm gần nhất (Điều 20 NĐ214)
+→ Không có vi phạm: 5đ | Vi phạm nhỏ đã khắc phục: 3đ | Vi phạm nghiêm trọng: 1đ</t></si><si><t>• Nghị định 214/2025/NĐ-CP hướng dẫn Luật Đấu thầu
+  https://thuvienphapluat.vn/van-ban/Dau-tu/Nghi-dinh-214-2025-ND-CP
+• Luật Đấu thầu số 22/2023/QH15 (sửa đổi 2024)
+  https://thuvienphapluat.vn/van-ban/Dau-tu/Luat-Dau-thau-2023-22-2023-QH15-521746.aspx</t></si><si><t>④ Thông tin công khai – Hệ thống mạng đấu thầu quốc gia
+https://muasamcong.mpi.gov.vn/web/guest/organizations-violators</t></si><si><t>[A2.2] Tình trạng trên CSDL quốc gia về nhà thầu (Điều 19 NĐ214)
+→ Không có thông tin vi phạm trên hệ thống mạng đấu thầu quốc gia</t></si><si><t>• Nghị định 214/2025/NĐ-CP hướng dẫn Luật Đấu thầu
+  https://thuvienphapluat.vn/van-ban/Dau-tu/Nghi-dinh-214-2025-ND-CP</t></si><si><t>④ Thông tin công khai – CSDL quốc gia về nhà thầu (Điều 19 NĐ214)
+https://muasamcong.mpi.gov.vn</t></si><si><t>[A2.3] Số lần bị chấm dứt hợp đồng do lỗi nhà cung cấp
+→ 0 lần: 5đ | 1 lần: 3đ | ≥2 lần: 1đ</t></si><si><t>• Nghị định 214/2025/NĐ-CP hướng dẫn Luật Đấu thầu
+  https://thuvienphapluat.vn/van-ban/Dau-tu/Nghi-dinh-214-2025-ND-CP
+• Quy chế BIDV số 321/QĐ-BIDV – Đầu tư mua sắm thuê TS CNTT
+  Nội bộ BIDV – B.ONE</t></si><si><t>① Hồ sơ/đánh giá nội bộ BIDV
+(lịch sử hợp đồng, biên bản nghiệm thu, phản hồi đơn vị sử dụng – lưu trữ B.ONE)
+③ Khảo sát tham chiếu khách hàng (Reference Check)
+(BIDV liên hệ trực tiếp khách hàng cũ của NCC để xác minh thông tin)</t></si><si><t>[A2.4] Số lần bị phạt/bồi thường hợp đồng
+→ Không có: 5đ | Có nhưng đã giải quyết: 3đ | Đang tranh chấp: 1đ</t></si><si><t>Hàng hóa, PTV</t></si><si><t>• Quy chế BIDV số 321/QĐ-BIDV – Đầu tư mua sắm thuê TS CNTT
+  Nội bộ BIDV – B.ONE
+• Nghị định 214/2025/NĐ-CP hướng dẫn Luật Đấu thầu
+  https://thuvienphapluat.vn/van-ban/Dau-tu/Nghi-dinh-214-2025-ND-CP</t></si><si><t>① Hồ sơ/đánh giá nội bộ BIDV
+(lịch sử hợp đồng, biên bản nghiệm thu, phản hồi đơn vị sử dụng – lưu trữ B.ONE)</t></si><si><t>[A2.5] Tranh chấp pháp lý đang xử lý liên quan đến hợp đồng CNTT
+→ Không có: 5đ | Có nhưng nhỏ: 3đ | Tranh chấp lớn/kiện tụng: 1đ</t></si><si><t>④ Thông tin công khai – Cổng thông tin điện tử Tòa án nhân dân
+https://congbobanan.toaan.gov.vn (tra cứu án lệ, bản án liên quan)
+① Người khảo sát chủ động đánh giá
+(quan sát thực tế, kiểm tra hiện trường, phỏng vấn, đối chiếu hồ sơ nội bộ BIDV)</t></si><si><t>[A2.6] Nhân sự bị kết án hình sự liên quan đấu thầu (Điều 20 NĐ214)
+→ Không có trong 3 năm gần nhất theo quy định pháp luật về hình sự</t></si><si><t>④ Thông tin công khai – Cổng thông tin điện tử Tòa án nhân dân
+https://congbobanan.toaan.gov.vn (tra cứu án lệ, bản án liên quan)
+④ Thông tin công khai – Hệ thống mạng đấu thầu quốc gia
+https://muasamcong.mpi.gov.vn/web/guest/organizations-violators</t></si><si><t>A3</t></si><si><t>[Layer 1]
+Danh tiếng &amp; Tham chiếu từ khách hàng</t></si><si><t>[A3.1] Số lượng khách hàng là ngân hàng/TCTD tại Việt Nam
+→ ≥5 ngân hàng: 5đ | 3–4: 4đ | 1–2: 3đ | 0: 1đ</t></si><si><t>② Thông tin tại Hồ sơ dự thầu/Hồ sơ đề xuất
+(HSDT/HSĐX do nhà cung cấp nộp khi tham gia LCNT/LCNCC)
+③ Khảo sát tham chiếu khách hàng (Reference Check)
+(BIDV liên hệ trực tiếp khách hàng cũ của NCC để xác minh thông tin)</t></si><si><t>[A3.2] Thư tham chiếu/đánh giá từ khách hàng cũ
+→ ≥3 thư tích cực từ TCTD: 5đ | 1–2 thư: 3đ | Không có: 1đ</t></si><si><t>[A3.3] Xếp hạng/giải thưởng trong ngành CNTT ngân hàng
+→ Có giải thưởng uy tín quốc tế/quốc gia (IDC, Gartner, VNBA…)</t></si><si><t>• Gartner Magic Quadrant – Đánh giá độc lập nhà cung cấp công nghệ
+  https://www.gartner.com/en/research/methodologies/magic-quadrants-research
+• IDC MarketScape – Đánh giá thị trường công nghệ thông tin
+  https://www.idc.com/getdoc.jsp?containerId=IDC_P39536</t></si><si><t>② Thông tin tại Hồ sơ dự thầu/Hồ sơ đề xuất
+(HSDT/HSĐX do nhà cung cấp nộp khi tham gia LCNT/LCNCC)
+① Người khảo sát chủ động đánh giá
+(quan sát thực tế, kiểm tra hiện trường, phỏng vấn, đối chiếu hồ sơ nội bộ BIDV)</t></si><si><t>[A3.4] Đánh giá của tổ chức phân tích độc lập (Gartner/IDC)
+→ Được xếp hạng tích cực trong Magic Quadrant hoặc IDC MarketScape</t></si><si><t>Hàng hóa</t></si><si><t>④ Thông tin công khai – Báo cáo Gartner/IDC
+(https://www.gartner.com, https://www.idc.com – mua quyền truy cập hoặc bản tóm tắt công khai)</t></si><si><t>[A3.5] Phản hồi từ BIDV về lịch sử hợp tác (nếu có)
+→ Đánh giá nội bộ BIDV từ các lần hợp tác trước (nếu có)</t></si><si><t>• Quy chế BIDV số 321/QĐ-BIDV – Đầu tư mua sắm thuê TS CNTT
+  Nội bộ BIDV – B.ONE
+• Quy định BIDV số 3082 – Trình tự thủ tục ĐTMS thuê TSDV CNTT
+  Nội bộ BIDV – B.ONE</t></si><si><t>[A3.6] Mức độ hiện diện thị trường (market share tại VN)
+→ Thị phần dẫn đầu phân khúc: 5đ | Top 3: 4đ | Khác: 2đ</t></si><si><t>④ Thông tin công khai – Báo cáo Gartner/IDC
+(https://www.gartner.com, https://www.idc.com – mua quyền truy cập hoặc bản tóm tắt công khai)
+① Người khảo sát chủ động đánh giá
+(quan sát thực tế, kiểm tra hiện trường, phỏng vấn, đối chiếu hồ sơ nội bộ BIDV)</t></si><si><t>A4</t></si><si><t>[Layer 1]
+Minh bạch &amp; Chống tham nhũng</t></si><si><t>[A4.1] Chính sách chống tham nhũng, hối lộ
+→ Có chính sách bằng văn bản, ban hành nội bộ và công khai</t></si><si><t>• ISO 26000:2010 – Hướng dẫn trách nhiệm xã hội
+  https://www.iso.org/iso-26000-social-responsibility.html
+• Quy chế BIDV số 321/QĐ-BIDV – Đầu tư mua sắm thuê TS CNTT
+  Nội bộ BIDV – B.ONE</t></si><si><t>[A4.2] Tuân thủ quy định phòng chống rửa tiền (AML)
+→ Có quy trình AML/KYC phù hợp quy định NHNN và pháp luật VN</t></si><si><t>TV, PTV</t></si><si><t>• Luật PCRT số 14/2022/QH15 – Phòng chống rửa tiền
+  https://thuvienphapluat.vn/van-ban/Tien-te-Ngan-hang/Luat-Phong-chong-rua-tien-2022-14-2022-QH15
+• Thông tư 09/2020/TT-NHNN – An ninh thông tin ngân hàng
+  https://thuvienphapluat.vn/van-ban/Tien-te-Ngan-hang/Thong-tu-09-2020-TT-NHNN</t></si><si><t>[A4.3] Công khai báo cáo tài chính hàng năm
+→ Báo cáo được kiểm toán độc lập và công bố đúng hạn</t></si><si><t>• Luật Doanh nghiệp số 59/2020/QH14 – Tư cách pháp nhân
+  https://thuvienphapluat.vn/van-ban/Doanh-nghiep/Luat-Doanh-nghiep-2020-428454.aspx
+• Nghị định 214/2025/NĐ-CP hướng dẫn Luật Đấu thầu
+  https://thuvienphapluat.vn/van-ban/Dau-tu/Nghi-dinh-214-2025-ND-CP</t></si><si><t>④ Thông tin công khai – Báo cáo tài chính/BCTC kiểm toán
+(công bố trên website doanh nghiệp, UBCKNN/HNX/HSX nếu là công ty niêm yết)</t></si><si><t>[A4.4] Không có xung đột lợi ích với BIDV
+→ Không có quan hệ sở hữu/thân nhân với cán bộ BIDV theo quy định</t></si><si><t>• Quy chế BIDV số 321/QĐ-BIDV – Đầu tư mua sắm thuê TS CNTT
+  Nội bộ BIDV – B.ONE
+• Luật Đấu thầu số 22/2023/QH15 (sửa đổi 2024)
+  https://thuvienphapluat.vn/van-ban/Dau-tu/Luat-Dau-thau-2023-22-2023-QH15-521746.aspx</t></si><si><t>① Người khảo sát chủ động đánh giá
+(quan sát thực tế, kiểm tra hiện trường, phỏng vấn, đối chiếu hồ sơ nội bộ BIDV)
+① Hồ sơ/đánh giá nội bộ BIDV
+(lịch sử hợp đồng, biên bản nghiệm thu, phản hồi đơn vị sử dụng – lưu trữ B.ONE)</t></si><si><t>[A4.5] Tuân thủ nghĩa vụ thuế (kê khai và nộp thuế)
+→ Không nợ thuế quá hạn; kê khai đầy đủ (tiêu chí năng lực tài chính – NĐ214 Điều 10)</t></si><si><t>④ Thông tin công khai – Cổng thông tin Tổng cục Thuế
+https://www.gdt.gov.vn (tra cứu tình trạng nộp thuế, nợ thuế)</t></si><si><t>[A4.6] Tuân thủ quy định bảo mật thông tin ngân hàng
+→ Cam kết và thực thi bảo mật thông tin khách hàng/ngân hàng theo TT09/2020/TT-NHNN</t></si><si><t>• Thông tư 09/2020/TT-NHNN – An ninh thông tin ngân hàng
+  https://thuvienphapluat.vn/van-ban/Tien-te-Ngan-hang/Thong-tu-09-2020-TT-NHNN
+• ISO/IEC 27001:2022 – Hệ thống quản lý an toàn thông tin
+  https://www.iso.org/standard/27001</t></si><si><t>A5</t></si><si><t>[Layer 1]
+Quan hệ đối tác &amp; Chứng nhận quốc tế</t></si><si><t>[A5.1] Đối tác được ủy quyền của nhà sản xuất (Authorization Partner)
+→ Có giấy ủy quyền chính thức từ nhà sản xuất gốc (OEM) – căn cứ xác minh nguồn gốc hàng hóa</t></si><si><t>② Thông tin tại Hồ sơ dự thầu/Hồ sơ đề xuất
+(HSDT/HSĐX do nhà cung cấp nộp khi tham gia LCNT/LCNCC)
+④ Thông tin công khai – Cổng tra cứu đối tác ủy quyền của hãng (OEM Partner Portal)
+(ví dụ: Cisco Partner Locator, Microsoft Partner Center…)</t></si><si><t>[A5.2] Chứng nhận ISO 9001 (Quản lý chất lượng)
+→ ISO 9001:2015 còn hiệu lực: 5đ | Đang xây dựng: 3đ | Không có: 1đ</t></si><si><t>• ISO 9001:2015 – Hệ thống quản lý chất lượng
+  https://www.iso.org/iso-9001-quality-management.html</t></si><si><t>④ Thông tin công khai – Cổng tra cứu chứng chỉ của tổ chức chứng nhận
+(IAF CertSearch: https://www.iafcertsearch.org hoặc website tổ chức cấp chứng nhận)
+② Thông tin tại Hồ sơ dự thầu/Hồ sơ đề xuất
+(HSDT/HSĐX do nhà cung cấp nộp khi tham gia LCNT/LCNCC)</t></si><si><t>[A5.3] Chứng nhận ISO 27001 (Bảo mật thông tin)
+→ ISO 27001 còn hiệu lực – bắt buộc với nhà cung cấp dịch vụ CNTT ngân hàng</t></si><si><t>PTV, TV</t></si><si><t>• ISO/IEC 27001:2022 – Hệ thống quản lý an toàn thông tin
+  https://www.iso.org/standard/27001
+• Thông tư 09/2020/TT-NHNN – An ninh thông tin ngân hàng
+  https://thuvienphapluat.vn/van-ban/Tien-te-Ngan-hang/Thong-tu-09-2020-TT-NHNN
+• Phụ lục QĐ3082 BIDV – Danh mục tiêu chuẩn đánh giá mua sắm bền vững
+  Nội bộ BIDV – B.ONE</t></si><si><t>[A5.4] Đối tác ưu tiên của các tập đoàn CNTT lớn (Microsoft/Cisco/…)
+→ Gold/Platinum Partner: 5đ | Silver: 4đ | Không có: 2đ</t></si><si><t>④ Thông tin công khai – Cổng tra cứu đối tác ủy quyền của hãng (OEM Partner Portal)
+(ví dụ: Cisco Partner Locator, Microsoft Partner Center…)
+② Thông tin tại Hồ sơ dự thầu/Hồ sơ đề xuất
+(HSDT/HSĐX do nhà cung cấp nộp khi tham gia LCNT/LCNCC)</t></si><si><t>[A5.5] Tham gia Hiệp hội CNTT/Ngân hàng trong nước (VNISA, VINASA…)
+→ Thành viên tích cực của hiệp hội uy tín trong ngành</t></si><si><t>[A5.6] Thứ hạng tín nhiệm/đánh giá tài chính từ TCTD
+→ Có xếp hạng tín nhiệm hoặc đánh giá tích cực từ tổ chức tài chính</t></si><si><t>④ Thông tin công khai – Trung tâm Thông tin Tín dụng Quốc gia (CIC)
+https://cic.org.vn (tra cứu nợ xấu, xếp hạng tín dụng – qua đầu mối QLRR/QHKH)</t></si><si><t>TỔNG ĐIỂM TIÊU CHÍ A (quy đổi theo trọng số % – tối đa 100)</t></si><si><t>B – NĂNG LỰC NHÀ CUNG CẤP</t></si><si><t>Trọng số tổng thể: 30%  |  Điểm tối đa: 100  |  [NCC]=Nhà cung cấp  [SP]=Sản phẩm  [DV]=Dịch vụ</t></si><si><t>B1</t></si><si><t>[Layer 1]
+Năng lực tài chính</t></si><si><t>[B1.1] Doanh thu hàng năm (3 năm gần nhất)
+→ ≥200 tỷ VND: 5đ | 100–200 tỷ: 4đ | 50–100 tỷ: 3đ | &lt;50 tỷ: 1đ</t></si><si><t>② Thông tin tại Hồ sơ dự thầu/Hồ sơ đề xuất
+(HSDT/HSĐX do nhà cung cấp nộp khi tham gia LCNT/LCNCC)
+④ Thông tin công khai – Báo cáo tài chính/BCTC kiểm toán
+(công bố trên website doanh nghiệp, UBCKNN/HNX/HSX nếu là công ty niêm yết)</t></si><si><t>[B1.2] Giá trị tài sản ròng (Net Asset Value)
+→ Tài sản ròng dương, tăng trưởng ổn định trong 3 năm liên tiếp</t></si><si><t>[B1.3] Hệ số thanh khoản (Current Ratio)
+→ ≥2.0: 5đ | 1.5–2.0: 4đ | 1.0–1.5: 3đ | &lt;1.0: 1đ</t></si><si><t>④ Thông tin công khai – Báo cáo tài chính/BCTC kiểm toán
+(công bố trên website doanh nghiệp, UBCKNN/HNX/HSX nếu là công ty niêm yết)
+② Thông tin tại Hồ sơ dự thầu/Hồ sơ đề xuất
+(HSDT/HSĐX do nhà cung cấp nộp khi tham gia LCNT/LCNCC)</t></si><si><t>[B1.4] Tỷ lệ nợ/vốn chủ sở hữu (D/E Ratio)
+→ D/E &lt;1: 5đ | 1–2: 4đ | 2–3: 3đ | &gt;3: 1đ</t></si><si><t>[B1.5] Lợi nhuận sau thuế (3 năm liên tiếp)
+→ Có lãi liên tục 3 năm: 5đ | 2 năm: 3đ | &lt;2 năm: 1đ</t></si><si><t>[B1.6] Khả năng huy động vốn/bảo lãnh thực hiện hợp đồng
+→ Có thư bảo lãnh ngân hàng phù hợp quy mô gói thầu</t></si><si><t>② Thông tin tại Hồ sơ dự thầu/Hồ sơ đề xuất
+(HSDT/HSĐX do nhà cung cấp nộp khi tham gia LCNT/LCNCC)</t></si><si><t>[B1.7] Không có nợ xấu/nợ quá hạn tại các TCTD
+→ Không có nợ xấu nhóm 3–5 tại bất kỳ TCTD nào</t></si><si><t>• Thông tư 09/2020/TT-NHNN – An ninh thông tin ngân hàng
+  https://thuvienphapluat.vn/van-ban/Tien-te-Ngan-hang/Thong-tu-09-2020-TT-NHNN
+• Nghị định 214/2025/NĐ-CP hướng dẫn Luật Đấu thầu
+  https://thuvienphapluat.vn/van-ban/Dau-tu/Nghi-dinh-214-2025-ND-CP</t></si><si><t>B2</t></si><si><t>[Layer 1]
+Năng lực kỹ thuật &amp; Công nghệ</t></si><si><t>[B2.1] Cơ sở hạ tầng kỹ thuật (phòng lab, server, thiết bị thử nghiệm)
+→ Có đủ cơ sở vật chất kỹ thuật phục vụ thực hiện hợp đồng</t></si><si><t>① Người khảo sát chủ động đánh giá
+(quan sát thực tế, kiểm tra hiện trường, phỏng vấn, đối chiếu hồ sơ nội bộ BIDV)
+② Thông tin tại Hồ sơ dự thầu/Hồ sơ đề xuất
+(HSDT/HSĐX do nhà cung cấp nộp khi tham gia LCNT/LCNCC)</t></si><si><t>[B2.2] Năng lực nghiên cứu và phát triển (R&amp;D)
+→ Có đội ngũ R&amp;D, ngân sách R&amp;D từ ≥3% doanh thu</t></si><si><t>[B2.3] Sản phẩm/giải pháp đáp ứng yêu cầu kỹ thuật theo HSYC
+→ Điểm kỹ thuật theo yêu cầu cụ thể của từng gói thầu (đạt/không đạt hoặc chấm điểm)</t></si><si><t>② Thông tin tại Hồ sơ dự thầu/Hồ sơ đề xuất
+(HSDT/HSĐX do nhà cung cấp nộp khi tham gia LCNT/LCNCC)
+① Kiểm thử/đánh giá thực tế của BIDV
+(pentest độc lập, UAT/SAT, đo SLA thực tế trong quá trình vận hành)</t></si><si><t>[B2.4] Năng lực tích hợp hệ thống với hạ tầng CNTT ngân hàng
+→ Kinh nghiệm tích hợp với Core Banking, Switch, T24, v.v.</t></si><si><t>• Quy định BIDV số 3082 – Trình tự thủ tục ĐTMS thuê TSDV CNTT
+  Nội bộ BIDV – B.ONE
+• Quy chế BIDV số 321/QĐ-BIDV – Đầu tư mua sắm thuê TS CNTT
+  Nội bộ BIDV – B.ONE</t></si><si><t>[B2.5] Bản quyền phần mềm và giấy phép sử dụng hợp lệ
+→ Sản phẩm có bản quyền đầy đủ, không vi phạm SHTT</t></si><si><t>• Thông tư 40/2020/TT-BTTTT – Ưu tiên sản phẩm CNTT trong nước
+  https://thuvienphapluat.vn/van-ban/Cong-nghe-thong-tin/Thong-tu-40-2020-TT-BTTTT
+• Quy chế BIDV số 321/QĐ-BIDV – Đầu tư mua sắm thuê TS CNTT
+  Nội bộ BIDV – B.ONE</t></si><si><t>[B2.6] Năng lực bảo mật &amp; an ninh thông tin của sản phẩm/dịch vụ
+→ Có kiểm thử bảo mật (pentest), vá lỗi kịp thời, tuân thủ PCI DSS nếu liên quan thẻ</t></si><si><t>• ISO/IEC 27001:2022 – Hệ thống quản lý an toàn thông tin
+  https://www.iso.org/standard/27001
+• PCI DSS v4.0 – Tiêu chuẩn bảo mật dữ liệu thẻ thanh toán
+  https://www.pcisecuritystandards.org
+• Thông tư 09/2020/TT-NHNN – An ninh thông tin ngân hàng
+  https://thuvienphapluat.vn/van-ban/Tien-te-Ngan-hang/Thong-tu-09-2020-TT-NHNN</t></si><si><t>① Kiểm thử/đánh giá thực tế của BIDV
+(pentest độc lập, UAT/SAT, đo SLA thực tế trong quá trình vận hành)
+② Thông tin tại Hồ sơ dự thầu/Hồ sơ đề xuất
+(HSDT/HSĐX do nhà cung cấp nộp khi tham gia LCNT/LCNCC)</t></si><si><t>[B2.7] Hỗ trợ đa nền tảng và khả năng tương thích hệ thống
+→ Tương thích với hạ tầng hiện tại của BIDV (OS, DB, network)</t></si><si><t>• Quy định BIDV số 3082 – Trình tự thủ tục ĐTMS thuê TSDV CNTT
+  Nội bộ BIDV – B.ONE</t></si><si><t>B3</t></si><si><t>[Layer 1]
+Năng lực nhân sự</t></si><si><t>[B3.1] Số lượng nhân sự kỹ thuật chuyên trách
+→ ≥50 kỹ sư: 5đ | 20–50: 4đ | 10–20: 3đ | &lt;10: 1đ (tùy quy mô gói thầu)</t></si><si><t>[B3.2] Trình độ chuyên môn của nhân sự chủ chốt
+→ ≥70% có bằng đại học kỹ thuật CNTT trở lên; có chứng chỉ quốc tế</t></si><si><t>[B3.3] Chứng chỉ chuyên môn quốc tế (CISSP, CISA, PMP, AWS, v.v.)
+→ Số lượng và cấp độ chứng chỉ liên quan đến loại hàng hóa/dịch vụ</t></si><si><t>• Nghị định 214/2025/NĐ-CP hướng dẫn Luật Đấu thầu
+  https://thuvienphapluat.vn/van-ban/Dau-tu/Nghi-dinh-214-2025-ND-CP
+• ISO/IEC 27001:2022 – Hệ thống quản lý an toàn thông tin
+  https://www.iso.org/standard/27001</t></si><si><t>[B3.4] Chuyên gia có kinh nghiệm dự án ngân hàng/tài chính
+→ Chuyên gia có ≥3 năm kinh nghiệm triển khai tại ngân hàng</t></si><si><t>[B3.5] Tỷ lệ giữ chân nhân sự (Retention Rate)
+→ ≥85%: 5đ | 70–85%: 4đ | 55–70%: 3đ | &lt;55%: 1đ</t></si><si><t>[B3.6] Chính sách đào tạo và phát triển nhân lực nội bộ
+→ Có chương trình đào tạo có hệ thống, ngân sách đào tạo hàng năm</t></si><si><t>• ISO 9001:2015 – Hệ thống quản lý chất lượng
+  https://www.iso.org/iso-9001-quality-management.html
+• Quy chế BIDV số 321/QĐ-BIDV – Đầu tư mua sắm thuê TS CNTT
+  Nội bộ BIDV – B.ONE</t></si><si><t>[B3.7] Nhân sự dự phòng cho vị trí chủ chốt
+→ Có phương án thay thế nhân sự chủ chốt khi cần thiết (Điều 45 NĐ214)</t></si><si><t>B4</t></si><si><t>[Layer 1]
+Kinh nghiệm thực hiện hợp đồng tương tự</t></si><si><t>[B4.1] Số lượng hợp đồng tương tự đã thực hiện (5 năm gần nhất)
+→ ≥5 hợp đồng: 5đ | 3–4: 4đ | 1–2: 3đ | 0: 1đ</t></si><si><t>[B4.3] Kinh nghiệm tại các ngân hàng quy mô tương đương BIDV
+→ Có hợp đồng với Top 5 NHTM Việt Nam: 5đ | Ngân hàng khác: 3đ</t></si><si><t>[B4.4] Dự án có độ phức tạp tương đương (số lượng chi nhánh, user)
+→ Kinh nghiệm triển khai quy mô lớn (&gt;100 chi nhánh)</t></si><si><t>[B4.5] Hợp đồng đã và đang thực hiện với BIDV (nếu có)
+→ Lịch sử hợp tác tích cực với BIDV trong 5 năm gần nhất</t></si><si><t>[B4.6] Mức độ hoàn thành đúng tiến độ của các hợp đồng trước
+→ ≥90% hợp đồng hoàn thành đúng hạn: 5đ | 70–90%: 3đ | &lt;70%: 1đ</t></si><si><t>[B4.7] Kinh nghiệm cung cấp dịch vụ bảo trì dài hạn (&gt;3 năm)
+→ Có hợp đồng bảo trì/hỗ trợ kỹ thuật dài hạn với khách hàng lớn</t></si><si><t>PTV</t></si><si><t>B5</t></si><si><t>[Layer 1]
+Năng lực sản xuất &amp; Chuỗi cung ứng</t></si><si><t>[B5.1] Quan hệ với nhà sản xuất gốc (OEM) &amp; chuỗi phân phối
+→ Đại lý cấp 1/đối tác ủy quyền trực tiếp của OEM</t></si><si><t>[B5.2] Khả năng cung ứng số lượng lớn theo yêu cầu đột xuất
+→ Có kho dự trữ/cam kết thời gian giao hàng cụ thể</t></si><si><t>[B5.3] Quản lý rủi ro chuỗi cung ứng (nguồn thay thế)
+→ Có ít nhất 2 nguồn cung thay thế cho sản phẩm chủ lực</t></si><si><t>[B5.4] Quy trình kiểm soát chất lượng đầu vào (QC/QA)
+→ Có quy trình QC/QA tài liệu hóa và thực hiện nghiêm túc</t></si><si><t>[B5.5] Năng lực kho bãi, logistics và giao nhận
+→ Có kho bãi đạt chuẩn, hệ thống theo dõi vận chuyển</t></si><si><t>[B5.6] Khả năng cung cấp linh kiện thay thế trong thời gian bảo hành
+→ Cam kết thời gian cung cấp linh kiện thay thế &lt;24h</t></si><si><t>TỔNG ĐIỂM TIÊU CHÍ B (quy đổi theo trọng số % – tối đa 100)</t></si><si><t>C – KHẢ NĂNG THỰC THI HỢP ĐỒNG</t></si><si><t>C1</t></si><si><t>[Layer 1]
+Chất lượng thực hiện hợp đồng (đánh giá nhà cung cấp &amp; sản phẩm/dịch vụ)</t></si><si><t>[C1.1] [NCC] Tỷ lệ nghiệm thu đạt yêu cầu ngay lần đầu (First Pass Rate)
+→ ≥95% hạng mục nghiệm thu đạt ngay lần đầu: 5đ | 85–95%: 4đ | 75–85%: 3đ | &lt;75%: 1đ</t></si><si><t>• Quy chế BIDV số 321/QĐ-BIDV – Đầu tư mua sắm thuê TS CNTT
+  Nội bộ BIDV – B.ONE
+• Quy định BIDV số 3082 – Trình tự thủ tục ĐTMS thuê TSDV CNTT
+  Nội bộ BIDV – B.ONE
+• Nghị định 214/2025/NĐ-CP hướng dẫn Luật Đấu thầu
+  https://thuvienphapluat.vn/van-ban/Dau-tu/Nghi-dinh-214-2025-ND-CP</t></si><si><t>[C1.2] [NCC] Chất lượng quản lý và điều phối đội ngũ triển khai
+→ Đội ngũ được tổ chức rõ ràng, có đầu mối liên lạc, phản hồi kịp thời</t></si><si><t>① Hồ sơ/đánh giá nội bộ BIDV
+(lịch sử hợp đồng, biên bản nghiệm thu, phản hồi đơn vị sử dụng – lưu trữ B.ONE)
+① Người khảo sát chủ động đánh giá
+(quan sát thực tế, kiểm tra hiện trường, phỏng vấn, đối chiếu hồ sơ nội bộ BIDV)</t></si><si><t>[C1.3] [NCC] Chất lượng tài liệu bàn giao (hồ sơ kỹ thuật, hướng dẫn vận hành)
+→ Tài liệu đầy đủ, chuẩn xác, tiếng Việt/song ngữ theo yêu cầu hợp đồng</t></si><si><t>[C1.4] [NCC] Chất lượng dịch vụ tư vấn – giá trị thực tiễn của báo cáo/khuyến nghị
+→ Báo cáo/tư vấn có giá trị ứng dụng thực tế, được BIDV áp dụng vào hoạt động</t></si><si><t>TV</t></si><si><t>[C1.5] [NCC] Sự hài lòng của người dùng cuối (khảo sát nội bộ BIDV)
+→ Điểm satisfaction ≥4/5: 5đ | 3.5–4: 4đ | 3–3.5: 3đ | &lt;3: 1đ</t></si><si><t>[C1.6] [SP] Mức độ đáp ứng yêu cầu kỹ thuật so với cam kết hợp đồng
+→ Đạt 100% tối thiểu yêu cầu kỹ thuật theo HSYC và hợp đồng: 5đ | 90–100%: 3đ</t></si><si><t>① Kiểm thử/đánh giá thực tế của BIDV
+(pentest độc lập, UAT/SAT, đo SLA thực tế trong quá trình vận hành)
+① Hồ sơ/đánh giá nội bộ BIDV
+(lịch sử hợp đồng, biên bản nghiệm thu, phản hồi đơn vị sử dụng – lưu trữ B.ONE)</t></si><si><t>[C1.7] [SP] Kết quả kiểm thử chấp nhận người dùng (UAT/SAT)
+→ Vượt qua UAT/SAT với ≥95% test cases: 5đ | 85–95%: 3đ | &lt;85%: 1đ</t></si><si><t>• Quy định BIDV số 3082 – Trình tự thủ tục ĐTMS thuê TSDV CNTT
+  Nội bộ BIDV – B.ONE
+• Nghị định 214/2025/NĐ-CP hướng dẫn Luật Đấu thầu
+  https://thuvienphapluat.vn/van-ban/Dau-tu/Nghi-dinh-214-2025-ND-CP</t></si><si><t>[C1.8] [SP] Độ ổn định và tin cậy của sản phẩm sau khi đưa vào vận hành
+→ Không có lỗi nghiêm trọng (P1/P2) trong 3 tháng đầu sau golive: 5đ | 1–2 sự cố: 3đ</t></si><si><t>• Quy định BIDV số 3082 – Trình tự thủ tục ĐTMS thuê TSDV CNTT
+  Nội bộ BIDV – B.ONE
+• Thông tư 09/2020/TT-NHNN – An ninh thông tin ngân hàng
+  https://thuvienphapluat.vn/van-ban/Tien-te-Ngan-hang/Thong-tu-09-2020-TT-NHNN</t></si><si><t>① Hồ sơ/đánh giá nội bộ BIDV
+(lịch sử hợp đồng, biên bản nghiệm thu, phản hồi đơn vị sử dụng – lưu trữ B.ONE)
+① Kiểm thử/đánh giá thực tế của BIDV
+(pentest độc lập, UAT/SAT, đo SLA thực tế trong quá trình vận hành)</t></si><si><t>[C1.9] [SP] Tính bảo mật của sản phẩm/dịch vụ khi triển khai thực tế
+→ Không có lỗ hổng bảo mật nghiêm trọng phát hiện sau golive; đã qua kiểm thử pentest</t></si><si><t>① Kiểm thử/đánh giá thực tế của BIDV
+(pentest độc lập, UAT/SAT, đo SLA thực tế trong quá trình vận hành)</t></si><si><t>[C1.10] [SP] Khả năng tương thích và tích hợp thực tế với hệ thống BIDV
+→ Tích hợp thành công với các hệ thống BIDV theo đúng thiết kế kỹ thuật đã phê duyệt</t></si><si><t>C2</t></si><si><t>[Layer 1]
+Tuân thủ tiến độ &amp; Quản lý dự án</t></si><si><t>[C2.1] Tỷ lệ hoàn thành đúng tiến độ cam kết
+→ ≥95%: 5đ | 85–95%: 4đ | 75–85%: 3đ | &lt;75%: 1đ</t></si><si><t>• Nghị định 214/2025/NĐ-CP hướng dẫn Luật Đấu thầu
+  https://thuvienphapluat.vn/van-ban/Dau-tu/Nghi-dinh-214-2025-ND-CP
+• Quy chế BIDV số 321/QĐ-BIDV – Đầu tư mua sắm thuê TS CNTT
+  Nội bộ BIDV – B.ONE
+• Quy định BIDV số 3082 – Trình tự thủ tục ĐTMS thuê TSDV CNTT
+  Nội bộ BIDV – B.ONE</t></si><si><t>[C2.2] Phương pháp luận quản lý dự án được áp dụng
+→ Có áp dụng PMI/PRINCE2/Agile/Waterfall phù hợp với đặc thù dự án</t></si><si><t>• Chuẩn mực quản lý dự án PMI/PMBOK và PRINCE2
+  https://www.pmi.org/pmbok-guide-standards
+• Quy định BIDV số 3082 – Trình tự thủ tục ĐTMS thuê TSDV CNTT
+  Nội bộ BIDV – B.ONE</t></si><si><t>[C2.3] Năng lực báo cáo tiến độ định kỳ cho BIDV
+→ Báo cáo đúng hạn, đầy đủ nội dung, cảnh báo sớm rủi ro theo biểu mẫu BIDV</t></si><si><t>[C2.4] Xử lý thay đổi phạm vi (Change Management)
+→ Quy trình xử lý thay đổi rõ ràng, không phát sinh tranh chấp ngoài phạm vi hợp đồng</t></si><si><t>[C2.5] Khả năng xử lý sự cố khẩn cấp ảnh hưởng hoạt động ngân hàng
+→ Có quy trình P1/P2 incident với SLA cam kết cụ thể</t></si><si><t>• Thông tư 09/2020/TT-NHNN – An ninh thông tin ngân hàng
+  https://thuvienphapluat.vn/van-ban/Tien-te-Ngan-hang/Thong-tu-09-2020-TT-NHNN
+• Quy định BIDV số 3082 – Trình tự thủ tục ĐTMS thuê TSDV CNTT
+  Nội bộ BIDV – B.ONE</t></si><si><t>[C2.6] Quản lý rủi ro và kế hoạch dự phòng dự án
+→ Có Risk Register và Contingency Plan được phê duyệt</t></si><si><t>[C2.7] Không tự ý thay đổi nhân sự chủ chốt khi chưa được chấp thuận
+→ Tuân thủ điều khoản nhân sự theo Điều 45 NĐ214</t></si><si><t>C3</t></si><si><t>[Layer 1]
+Dịch vụ bảo hành, bảo trì &amp; Hỗ trợ kỹ thuật</t></si><si><t>[C3.1] Cam kết SLA bảo hành (thời gian phản hồi và khắc phục)
+→ Response &lt;4h, Resolve &lt;8h (P1): 5đ | &lt;8h/&lt;24h: 4đ | Chưa cam kết: 2đ</t></si><si><t>[C3.2] Thời gian bảo hành tối thiểu cam kết
+→ ≥24 tháng: 5đ | 12–24 tháng: 3đ | &lt;12 tháng: 1đ</t></si><si><t>[C3.3] Chất lượng và tốc độ hỗ trợ kỹ thuật (Helpdesk/NOC)
+→ Có Helpdesk 24/7, NOC, hệ thống ticketing; SLA đo lường được</t></si><si><t>• ISO/IEC 20000-1:2018 – Hệ thống quản lý dịch vụ CNTT
+  https://www.iso.org/standard/70636.html
+• Quy định BIDV số 3082 – Trình tự thủ tục ĐTMS thuê TSDV CNTT
+  Nội bộ BIDV – B.ONE</t></si><si><t>[C3.4] Năng lực cung cấp bản vá lỗi, cập nhật phiên bản (patch management)
+→ Vá lỗi bảo mật critical trong &lt;24h; bản cập nhật định kỳ theo lịch</t></si><si><t>• ISO/IEC 27001:2022 – Hệ thống quản lý an toàn thông tin
+  https://www.iso.org/standard/27001
+• Thông tư 09/2020/TT-NHNN – An ninh thông tin ngân hàng
+  https://thuvienphapluat.vn/van-ban/Tien-te-Ngan-hang/Thong-tu-09-2020-TT-NHNN</t></si><si><t>[C3.5] Hỗ trợ onsite khi cần thiết (bao gồm chi nhánh vùng sâu/xa)
+→ Có đội kỹ thuật onsite hoặc cam kết thời gian di chuyển &lt;4h</t></si><si><t>[C3.6] Cung cấp đào tạo vận hành cho cán bộ BIDV
+→ Có chương trình đào tạo chuyển giao kiến thức sau triển khai</t></si><si><t>[C3.7] Tài liệu kỹ thuật và hướng dẫn vận hành bằng tiếng Việt
+→ Tài liệu đầy đủ bằng tiếng Việt hoặc song ngữ (Việt–Anh)</t></si><si><t>C4</t></si><si><t>[Layer 1]
+Tuân thủ pháp lý &amp; Điều khoản hợp đồng</t></si><si><t>[C4.1] Tuân thủ điều kiện, điều khoản hợp đồng (không thương thảo lại các cam kết cốt lõi)
+→ Không vi phạm các điều khoản cốt lõi của hợp đồng đã ký</t></si><si><t>[C4.2] Thực hiện bảo lãnh thực hiện hợp đồng đầy đủ, đúng hạn
+→ Nộp bảo lãnh đúng hạn, đúng hình thức theo quy định NĐ214</t></si><si><t>[C4.3] Không để xảy ra tranh chấp/kiện tụng hợp đồng
+→ 0 vụ tranh chấp với BIDV: 5đ | 1 vụ nhỏ đã xử lý: 3đ | Nhiều vụ: 1đ</t></si><si><t>① Hồ sơ/đánh giá nội bộ BIDV
+(lịch sử hợp đồng, biên bản nghiệm thu, phản hồi đơn vị sử dụng – lưu trữ B.ONE)
+④ Thông tin công khai – Cổng thông tin điện tử Tòa án nhân dân
+https://congbobanan.toaan.gov.vn (tra cứu án lệ, bản án liên quan)</t></si><si><t>[C4.4] Tuân thủ quy định bảo mật thông tin trong quá trình thực hiện
+→ Có NDA, tuân thủ chính sách bảo mật BIDV trong suốt vòng đời hợp đồng</t></si><si><t>• Thông tư 09/2020/TT-NHNN – An ninh thông tin ngân hàng
+  https://thuvienphapluat.vn/van-ban/Tien-te-Ngan-hang/Thong-tu-09-2020-TT-NHNN
+• ISO/IEC 27001:2022 – Hệ thống quản lý an toàn thông tin
+  https://www.iso.org/standard/27001
+• Quy chế BIDV số 321/QĐ-BIDV – Đầu tư mua sắm thuê TS CNTT
+  Nội bộ BIDV – B.ONE</t></si><si><t>[C4.5] Xử lý khiếu nại/kiến nghị trong thời hạn quy định (Điều 22 NĐ214)
+→ Phản hồi khiếu nại trong 7 ngày làm việc theo quy định NĐ214</t></si><si><t>• Nghị định 214/2025/NĐ-CP hướng dẫn Luật Đấu thầu
+  https://thuvienphapluat.vn/van-ban/Dau-tu/Nghi-dinh-214-2025-ND-CP
+• Quy định BIDV số 3082 – Trình tự thủ tục ĐTMS thuê TSDV CNTT
+  Nội bộ BIDV – B.ONE</t></si><si><t>[C4.6] Tuân thủ quy trình nghiệm thu theo Quy định BIDV (Mục 7 QĐ3082)
+→ Tham gia đầy đủ quy trình nghiệm thu, ký biên bản đúng hạn</t></si><si><t>[C4.7] Tuân thủ ưu tiên sản phẩm CNTT nội địa (TT40/2020/TT-BTTTT)
+→ Ưu tiên sản phẩm CNTT sản xuất trong nước được Bộ TTTT xác nhận</t></si><si><t>C5</t></si><si><t>[Layer 1]
+Khả năng ứng phó rủi ro &amp; Liên tục kinh doanh</t></si><si><t>[C5.1] Kế hoạch liên tục kinh doanh (BCP/DRP) của nhà cung cấp
+→ Có BCP/DRP được kiểm thử hàng năm: 5đ | Có nhưng chưa test: 3đ | Không có: 1đ</t></si><si><t>• Tiêu chuẩn ISO 22301:2019 – Quản lý liên tục kinh doanh (BCM)
+  https://www.iso.org/standard/75106.html
+• Quy định BIDV số 3082 – Trình tự thủ tục ĐTMS thuê TSDV CNTT
+  Nội bộ BIDV – B.ONE</t></si><si><t>[C5.2] Trung tâm dữ liệu dự phòng (DR Site) đạt chuẩn
+→ Có DR Site tại data center đạt chuẩn Uptime Institute Tier 3+</t></si><si><t>• Tiêu chuẩn Uptime Institute Tier Classification cho Data Center
+  https://uptimeinstitute.com/tiers
+• Quy định BIDV số 3082 – Trình tự thủ tục ĐTMS thuê TSDV CNTT
+  Nội bộ BIDV – B.ONE</t></si><si><t>[C5.3] Khả năng scale up/down theo nhu cầu của BIDV
+→ Cam kết mở rộng năng lực trong &lt;1 tháng khi BIDV có yêu cầu</t></si><si><t>② Thông tin tại Hồ sơ dự thầu/Hồ sơ đề xuất
+(HSDT/HSĐX do nhà cung cấp nộp khi tham gia LCNT/LCNCC)
+① Hồ sơ/đánh giá nội bộ BIDV
+(lịch sử hợp đồng, biên bản nghiệm thu, phản hồi đơn vị sử dụng – lưu trữ B.ONE)</t></si><si><t>[C5.4] Quản lý rủi ro bên thứ ba (Third Party Risk Management)
+→ Có quy trình đánh giá nhà thầu phụ; không thuê lại toàn bộ gói thầu</t></si><si><t>[C5.5] Bảo hiểm trách nhiệm nghề nghiệp và bảo hiểm rủi ro
+→ Có hợp đồng bảo hiểm phù hợp với loại rủi ro của dịch vụ cung cấp</t></si><si><t>[C5.6] Kế hoạch chuyển giao khi kết thúc hợp đồng (Exit Plan)
+→ Có Exit Plan rõ ràng, hỗ trợ bàn giao đầy đủ cho nhà cung cấp mới</t></si><si><t>TỔNG ĐIỂM TIÊU CHÍ C (quy đổi theo trọng số % – tối đa 100)</t></si><si><t>D – PHÁT TRIỂN BỀN VỮNG (ESG)</t></si><si><t>Trọng số tổng thể: 15%  |  Điểm tối đa: 100  |  [NCC]=Nhà cung cấp  [SP]=Sản phẩm  [DV]=Dịch vụ</t></si><si><t>D1</t></si><si><t>[Layer 1]
+Môi trường – Nhà cung cấp (Environmental – Supplier)</t></si><si><t>[D1.1] [NCC] Chính sách giảm thiểu phát thải carbon và Net Zero
+→ Có mục tiêu giảm phát thải bằng văn bản, báo cáo định kỳ (GHG Protocol)</t></si><si><t>• GRI Standards – Khung báo cáo phát triển bền vững
+  https://www.globalreporting.org/standards/
+• TCFD – Task Force on Climate-related Financial Disclosures
+  https://www.fsb-tcfd.org
+• Phụ lục QĐ3082 BIDV – Danh mục tiêu chuẩn đánh giá mua sắm bền vững
+  Nội bộ BIDV – B.ONE</t></si><si><t>[D1.2] [NCC] Chứng nhận ISO 14001 (Hệ thống quản lý môi trường)
+→ ISO 14001:2015 còn hiệu lực: 5đ | Đang xây dựng: 3đ | Không có: 1đ</t></si><si><t>• ISO 14001:2015 – Hệ thống quản lý môi trường
+  https://www.iso.org/iso-14001-environmental-management.html
+• Phụ lục QĐ3082 BIDV – Danh mục tiêu chuẩn đánh giá mua sắm bền vững
+  Nội bộ BIDV – B.ONE
+• ISO 20400:2017 – Mua sắm bền vững
+  https://www.iso.org/standard/63026.html</t></si><si><t>[D1.3] [NCC] Chứng nhận ISO 50001 (Quản lý năng lượng) hoặc tương đương
+→ Có chiến lược và hệ thống quản lý năng lượng theo ISO 50001</t></si><si><t>• ISO 50001:2018 – Quản lý năng lượng
+  https://www.iso.org/iso-50001-energy-management.html
+• Phụ lục QĐ3082 BIDV – Danh mục tiêu chuẩn đánh giá mua sắm bền vững
+  Nội bộ BIDV – B.ONE</t></si><si><t>[D1.4] [NCC] Chính sách tái chế và xử lý thiết bị cuối vòng đời (WEEE)
+→ Có chương trình thu hồi thiết bị cũ, xử lý đúng quy định môi trường VN</t></si><si><t>• ISO 14001:2015 – Hệ thống quản lý môi trường
+  https://www.iso.org/iso-14001-environmental-management.html
+• Phụ lục QĐ3082 BIDV – Danh mục tiêu chuẩn đánh giá mua sắm bền vững
+  Nội bộ BIDV – B.ONE</t></si><si><t>[D1.5] [NCC] Cam kết và lộ trình sử dụng năng lượng tái tạo (RE100/tương đương)
+→ Có cam kết hoặc đang trong lộ trình chuyển sang năng lượng tái tạo</t></si><si><t>• Science Based Targets initiative (SBTi) – Mục tiêu giảm phát thải khoa học
+  https://sciencebasedtargets.org
+• GRI Standards – Khung báo cáo phát triển bền vững
+  https://www.globalreporting.org/standards/</t></si><si><t>③ Thông tin cập nhật từ nhà cung cấp
+(văn bản, báo cáo, chứng nhận do NCC chủ động cung cấp/cập nhật định kỳ)
+② Thông tin tại Hồ sơ dự thầu/Hồ sơ đề xuất
+(HSDT/HSĐX do nhà cung cấp nộp khi tham gia LCNT/LCNCC)</t></si><si><t>[D1.6] [NCC] Tham gia đánh giá ESG bởi tổ chức độc lập (EcoVadis, CDP…)
+→ Được đánh giá tích cực bởi tổ chức ESG uy tín quốc tế</t></si><si><t>• EcoVadis – Nền tảng đánh giá ESG độc lập cho chuỗi cung ứng
+  https://ecovadis.com
+• TCFD – Task Force on Climate-related Financial Disclosures
+  https://www.fsb-tcfd.org
+• Phụ lục QĐ3082 BIDV – Danh mục tiêu chuẩn đánh giá mua sắm bền vững
+  Nội bộ BIDV – B.ONE</t></si><si><t>④ Thông tin công khai – Nền tảng đánh giá ESG bên thứ ba
+(EcoVadis: https://ecovadis.com, CDP: https://www.cdp.net)</t></si><si><t>[D1.7] [NCC] Lộ trình Net Zero với mốc thời gian cụ thể (SBTi hoặc tương đương)
+→ Có mục tiêu giảm phát thải dựa trên khoa học (Science-Based Targets)</t></si><si><t>D2</t></si><si><t>[Layer 1]
+Môi trường – Sản phẩm/Dịch vụ (Environmental – Product/Service)</t></si><si><t>[D2.1] [SP] Chứng nhận ENERGY STAR cho thiết bị phần cứng
+→ Thiết bị đạt chứng nhận ENERGY STAR (theo Phụ lục 01 QĐ3082)</t></si><si><t>• ENERGY STAR – Nhãn hiệu quả năng lượng (EPA Hoa Kỳ)
+  https://www.energystar.gov
+• Phụ lục QĐ3082 BIDV – Danh mục tiêu chuẩn đánh giá mua sắm bền vững
+  Nội bộ BIDV – B.ONE</t></si><si><t>[D2.2] [SP] Chứng nhận EPEAT (Gold/Silver/Bronze) cho sản phẩm điện tử
+→ Sản phẩm được xếp hạng EPEAT phù hợp theo Phụ lục 01 QĐ3082</t></si><si><t>• EPEAT – Electronic Product Environmental Assessment Tool
+  https://www.epeat.net
+• Phụ lục QĐ3082 BIDV – Danh mục tiêu chuẩn đánh giá mua sắm bền vững
+  Nội bộ BIDV – B.ONE</t></si><si><t>[D2.3] [SP] Chứng nhận TCO Certified (bền vững toàn diện sản phẩm CNTT)
+→ Sản phẩm có nhãn TCO Certified (môi trường + xã hội + an ninh mạng)</t></si><si><t>• TCO Certified – Nhãn bền vững sản phẩm CNTT
+  https://tcocertified.com
+• Phụ lục QĐ3082 BIDV – Danh mục tiêu chuẩn đánh giá mua sắm bền vững
+  Nội bộ BIDV – B.ONE</t></si><si><t>[D2.4] [SP] Chỉ số PUE của data center/dịch vụ cloud (nếu áp dụng)
+→ PUE ≤1.4: 5đ | 1.4–1.6: 4đ | 1.6–2.0: 3đ | &gt;2.0: 1đ</t></si><si><t>• Tiêu chuẩn PUE theo TCVN 14285-2:2024 / ISO/IEC 30134-2:2016
+  https://www.iso.org/standard/63451.html
+• Phụ lục QĐ3082 BIDV – Danh mục tiêu chuẩn đánh giá mua sắm bền vững
+  Nội bộ BIDV – B.ONE</t></si><si><t>[D2.5] [SP] Sử dụng vật liệu tái chế/thân thiện môi trường trong sản phẩm
+→ Tỷ lệ vật liệu tái chế ≥20%: 5đ | 10–20%: 3đ | &lt;10%: 1đ</t></si><si><t>• EPEAT – Electronic Product Environmental Assessment Tool
+  https://www.epeat.net
+• ISO 14001:2015 – Hệ thống quản lý môi trường
+  https://www.iso.org/iso-14001-environmental-management.html
+• Phụ lục QĐ3082 BIDV – Danh mục tiêu chuẩn đánh giá mua sắm bền vững
+  Nội bộ BIDV – B.ONE</t></si><si><t>[D2.6] [SP/DV] Sản phẩm/dịch vụ hỗ trợ chuyển đổi số xanh của ngân hàng
+→ Giải pháp giúp BIDV giảm tiêu thụ năng lượng/giấy tờ/in ấn</t></si><si><t>• ISO 20400:2017 – Mua sắm bền vững
+  https://www.iso.org/standard/63026.html
+• TCVN 12874:2020 – Mua sắm bền vững Việt Nam
+  https://www.tcvn.gov.vn</t></si><si><t>[D2.7] [SP] Ưu tiên sản phẩm CNTT sản xuất trong nước (TT40/2020/TT-BTTTT)
+→ Sản phẩm/giải pháp nội địa được Bộ TTTT xác nhận; áp dụng ưu đãi</t></si><si><t>• Thông tư 40/2020/TT-BTTTT – Ưu tiên sản phẩm CNTT trong nước
+  https://thuvienphapluat.vn/van-ban/Cong-nghe-thong-tin/Thong-tu-40-2020-TT-BTTTT
+• Phụ lục QĐ3082 BIDV – Danh mục tiêu chuẩn đánh giá mua sắm bền vững
+  Nội bộ BIDV – B.ONE</t></si><si><t>D3</t></si><si><t>[Layer 1]
+Xã hội (Social – Nhà cung cấp &amp; chuỗi cung ứng)</t></si><si><t>[D3.1] [NCC] Chính sách sức khỏe và an toàn nghề nghiệp (ISO 45001)
+→ Có chính sách OHS tài liệu hóa; chứng nhận ISO 45001 là lợi thế</t></si><si><t>• ISO 45001:2018 – Hệ thống quản lý an toàn sức khỏe nghề nghiệp
+  https://www.iso.org/iso-45001-occupational-health-and-safety.html
+• Phụ lục QĐ3082 BIDV – Danh mục tiêu chuẩn đánh giá mua sắm bền vững
+  Nội bộ BIDV – B.ONE</t></si><si><t>[D3.2] [NCC] Tuân thủ quy định lao động (không lao động trẻ em, cưỡng bức)
+→ Tuân thủ Bộ Luật Lao động VN và các tiêu chuẩn cốt lõi ILO</t></si><si><t>• Bộ Luật Lao động số 45/2019/QH14
+  https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Bo-luat-Lao-dong-2019-333670.aspx
+• Tiêu chuẩn lao động cốt lõi ILO (Core Labour Standards)
+  https://www.ilo.org/global/standards/introduction-to-international-labour-standards
+• ISO 26000:2010 – Hướng dẫn trách nhiệm xã hội
+  https://www.iso.org/iso-26000-social-responsibility.html</t></si><si><t>[D3.3] [NCC] Chính sách bình đẳng, không phân biệt đối xử và đa dạng
+→ Có chính sách EDI (Equity, Diversity &amp; Inclusion) bằng văn bản và thực thi</t></si><si><t>• ISO 26000:2010 – Hướng dẫn trách nhiệm xã hội
+  https://www.iso.org/iso-26000-social-responsibility.html
+• Tiêu chuẩn lao động cốt lõi ILO (Core Labour Standards)
+  https://www.ilo.org/global/standards/introduction-to-international-labour-standards</t></si><si><t>[D3.4] [NCC] Trách nhiệm xã hội doanh nghiệp (CSR) – chương trình cộng đồng
+→ Có ngân sách CSR và hoạt động cộng đồng có thể xác minh</t></si><si><t>• ISO 26000:2010 – Hướng dẫn trách nhiệm xã hội
+  https://www.iso.org/iso-26000-social-responsibility.html
+• GRI Standards – Khung báo cáo phát triển bền vững
+  https://www.globalreporting.org/standards/</t></si><si><t>[D3.5] [NCC] Chính sách phúc lợi nhân viên vượt mức tối thiểu pháp luật
+→ Bảo hiểm, phúc lợi bổ sung, Work-Life Balance, lương cạnh tranh</t></si><si><t>• Bộ Luật Lao động số 45/2019/QH14
+  https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Bo-luat-Lao-dong-2019-333670.aspx
+• ISO 45001:2018 – Hệ thống quản lý an toàn sức khỏe nghề nghiệp
+  https://www.iso.org/iso-45001-occupational-health-and-safety.html</t></si><si><t>[D3.6] [NCC] Trách nhiệm trong chuỗi cung ứng (Responsible Sourcing)
+→ Có chính sách kiểm tra điều kiện lao động tại nhà thầu phụ/đối tác</t></si><si><t>• ISO 26000:2010 – Hướng dẫn trách nhiệm xã hội
+  https://www.iso.org/iso-26000-social-responsibility.html
+• Tiêu chuẩn lao động cốt lõi ILO (Core Labour Standards)
+  https://www.ilo.org/global/standards/introduction-to-international-labour-standards
+• TCVN 12874:2020 – Mua sắm bền vững Việt Nam
+  https://www.tcvn.gov.vn</t></si><si><t>D4</t></si><si><t>[Layer 1]
+Quản trị bền vững (Governance)</t></si><si><t>[D4.1] [NCC] Cơ cấu quản trị doanh nghiệp bền vững (Board Diversity &amp; Independence)
+→ Có thành viên HĐQT độc lập, đa dạng về chuyên môn và giới tính</t></si><si><t>[D4.2] [NCC] Công bố thông tin ESG (Báo cáo phát triển bền vững định kỳ)
+→ Có báo cáo ESG hàng năm theo GRI Standards hoặc khung tương đương</t></si><si><t>• GRI Standards – Khung báo cáo phát triển bền vững
+  https://www.globalreporting.org/standards/
+• ISO 20400:2017 – Mua sắm bền vững
+  https://www.iso.org/standard/63026.html
+• TCVN 12874:2020 – Mua sắm bền vững Việt Nam
+  https://www.tcvn.gov.vn</t></si><si><t>④ Thông tin công khai – Nền tảng đánh giá ESG bên thứ ba
+(EcoVadis: https://ecovadis.com, CDP: https://www.cdp.net)
+③ Thông tin cập nhật từ nhà cung cấp
+(văn bản, báo cáo, chứng nhận do NCC chủ động cung cấp/cập nhật định kỳ)</t></si><si><t>[D4.3] [NCC] Chính sách quản lý rủi ro khí hậu (TCFD Framework)
+→ Có đánh giá rủi ro khí hậu theo TCFD hoặc đang xây dựng</t></si><si><t>• TCFD – Task Force on Climate-related Financial Disclosures
+  https://www.fsb-tcfd.org
+• Science Based Targets initiative (SBTi) – Mục tiêu giảm phát thải khoa học
+  https://sciencebasedtargets.org</t></si><si><t>[D4.4] [NCC] Tuân thủ ISO 26000 (Hướng dẫn trách nhiệm xã hội)
+→ Áp dụng hướng dẫn ISO 26000 trong hoạt động kinh doanh hàng ngày</t></si><si><t>• ISO 26000:2010 – Hướng dẫn trách nhiệm xã hội
+  https://www.iso.org/iso-26000-social-responsibility.html
+• TCVN 12874:2020 – Mua sắm bền vững Việt Nam
+  https://www.tcvn.gov.vn</t></si><si><t>[D4.5] [SP/DV] Chính sách bảo vệ dữ liệu người dùng (Nghị định 13/2023)
+→ Tuân thủ NĐ13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân và thông lệ GDPR</t></si><si><t>• Nghị định 13/2023/NĐ-CP – Bảo vệ dữ liệu cá nhân
+  https://thuvienphapluat.vn/van-ban/Cong-nghe-thong-tin/Nghi-dinh-13-2023-ND-CP
+• ISO/IEC 27001:2022 – Hệ thống quản lý an toàn thông tin
+  https://www.iso.org/standard/27001</t></si><si><t>[D4.6] [DV] Ứng dụng AI/ML để tối ưu hóa tiêu thụ tài nguyên và năng lượng
+→ Sử dụng công nghệ để giảm footprint vận hành dịch vụ CNTT</t></si><si><t>• ISO 50001:2018 – Quản lý năng lượng
+  https://www.iso.org/iso-50001-energy-management.html
+• GRI Standards – Khung báo cáo phát triển bền vững
+  https://www.globalreporting.org/standards/</t></si><si><t>TỔNG ĐIỂM TIÊU CHÍ D (quy đổi theo trọng số % – tối đa 100)</t></si><si><t>BẢNG TỔNG HỢP ĐÁNH GIÁ NHÀ CUNG CẤP CNTT</t></si><si><t>Nhập điểm từng tiêu chí ở các Sheet A–D để tính điểm tổng thể và phân loại nhà cung cấp tự động</t></si><si><t>Tên nhà cung cấp:</t></si><si><t>Mã nhà cung cấp:</t></si><si><t>Loại hình đánh giá:</t></si><si><t>Hàng hóa / TV / PTV</t></si><si><t>Kỳ đánh giá:</t></si><si><t>Người đánh giá:</t></si><si><t>STT</t></si><si><t>Tiêu chí chính</t></si><si><t>Trọng số (%)</t></si><si><t>Điểm thô (0–100)</t></si><si><t>Điểm quy đổi</t></si><si><t>Xếp loại thành phần</t></si><si><t>Lộ trình đề xuất</t></si><si><t>A – Uy tín nhà cung cấp</t></si><si><t>Tăng cường hợp tác; đề xuất ký MOU dài hạn</t></si><si><t>B – Năng lực nhà cung cấp</t></si><si><t>Tiếp tục hợp tác; đặt KPI cải thiện</t></si><si><t>C – Khả năng thực thi hợp đồng</t></si><si><t>Giám sát chặt; yêu cầu CAP (Corrective Action Plan)</t></si><si><t>D – Phát triển bền vững (ESG)</t></si><si><t>Xem xét chấm dứt; hạn chế hợp đồng mới</t></si><si><t>TỔNG ĐIỂM ĐẠT ĐƯỢC (thang 100 điểm)</t></si><si><t>BẢNG PHÂN LOẠI &amp; LỘ TRÌNH HỢP TÁC</t></si><si><t>Loại</t></si><si><t>Điểm số</t></si><si><t>Phân loại nhà cung cấp</t></si><si><t>Lộ trình hợp tác đề xuất</t></si><si><t>A</t></si><si><t>≥ 85 điểm</t></si><si><t>Nhà cung cấp chiến lược</t></si><si><t>Ký hợp đồng dài hạn 3–5 năm; tăng khối lượng mua sắm; mời tham gia đổi mới sáng tạo</t></si><si><t>B</t></si><si><t>70–84 điểm</t></si><si><t>Nhà cung cấp đủ điều kiện</t></si><si><t>Tiếp tục hợp tác; đánh giá lại hàng năm; đặt KPI cải thiện; có thể mở rộng phạm vi</t></si><si><t>C</t></si><si><t>55–69 điểm</t></si><si><t>Cần cải thiện</t></si><si><t>Hợp tác có điều kiện; yêu cầu Corrective Action Plan (CAP); giám sát chặt chẽ; giới hạn khối lượng</t></si><si><t>D</t></si><si><t>&lt; 55 điểm</t></si><si><t>Yếu kém</t></si><si><t>Xem xét chấm dứt hợp đồng; đưa vào danh sách giám sát đặc biệt; không phê duyệt hợp đồng mới</t></si><si><t xml:space="preserve">Nội dung trao đổi
+</t></si><si><t>Đánh giá NCC: thuê ngoài PTPM</t></si><si><t xml:space="preserve">- Theo dõi và quản lý ncc, cảnh báo sớm, phòng ngừa rủi ro cho BIDV liên quan đến khả năng thực hiện hợp đồng.
+- </t></si><si><t>- Thực hiện xếp hạng NCC theo từng lĩnh vực chính, cung cấp thông tin bổ trợ trong quá trình lựa chọn NCC</t></si><si><t>LỘ TRÌNH TRIỂN KHAI</t></si><si><t>Tần suất: năm 2026 - 1 lần, các năm tiếp theo 6 tháng 1 lần.</t></si><si><t xml:space="preserve">Báo cáo kết quả: ….t+1 tháng </t></si><si><t>đơn vị đầu mối đánh giá
+- Ban công nghệ đánh giá bổ sung.</t></si><si><t>Lộ trình:
+- Tool hóa:
+- Kết nối kho dữ liệu</t></si><si><r><t xml:space="preserve">C </t></r><r><rPr><sz val="10"/><color rgb="FFFF0000"/><rFont val="Arial"/><family val="2"/></rPr><t>– Năng lực th</t></r><r><rPr><sz val="10"/><color rgb="FF404040"/><rFont val="Arial"/></rPr><t>ực thi hợp đồng  (Trọng số: 30%)</t></r></si><si><r><t xml:space="preserve">phân loại theo Hàng hóa/ Tư vấn/ Phi tư  vấn hay theo đặc thù mua sắm tại BIDV
+- Hạ tầng: máy chủ, thiết bị mạng truyền thông, trjng tâm dữ liệu
+- Phần mềm/ ứng dụng: triển khai giải pháp phần mềm,  Bản quyền phần mềm:
+- Sản phẩm trí tuệ nhân tạo AI, dữ liệu lớn, ML
+- An ninh bảo mật: thiết bị, giải pháp, dịch vụ, lập báo cáo tuân thủ....
+- Nền tảng Cloud: </t></r><r><rPr><b/><sz val="11"/><color theme="1"/><rFont val="Calibri"/><family val="2"/><scheme val="minor"/></rPr><t>Nhóm chị Bình ncc nền tảng, SI</t></r><r><rPr><sz val="11"/><color theme="1"/><rFont val="Calibri"/><family val="2"/><scheme val="minor"/></rPr><t xml:space="preserve">
+- Tư vấn: chiến lược CNTT, Kiến trúc, ....
+- Thẻ: </t></r></si><si><r><t>[B4.2] Giá trị hợp đồng lớn nhất đã thực hiện thành công
+→ Giá trị ≥ dự toán gói thầu hiện tại:</t></r><r><rPr><sz val="9"/><color rgb="FFFF0000"/><rFont val="Arial"/><family val="2"/></rPr><t xml:space="preserve"> 5đ | 50–100%: 3đ | &lt;50%: 1đ</t></r></si><si><t>Route: hợp đồng</t></si></sst>

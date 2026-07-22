@@ -2,6 +2,7 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ScoringService } from '../common/scoring.service';
+import { defaultEvaluationConfig } from './default-evaluation-config';
 import {
   Evaluation,
   EvaluationConfig,
@@ -31,102 +32,52 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
     const config = await this.seedConfig();
     const suppliers = await this.seedSuppliers();
     await this.seedEvaluations(config, suppliers.slice(0, 4));
-    this.logger.log('Seeded initial supplier evaluation data');
+    this.logger.log('Seeded initial supplier evaluation data from workbook criteria');
   }
 
   private async seedConfig() {
     const config = this.configs.create({
-      name: 'Bộ tiêu chí đánh giá NCC CNTT 2026',
-      description: 'Bộ tiêu chí mặc định cho đánh giá định kỳ nhà cung cấp CNTT.',
+      name: defaultEvaluationConfig.name,
+      description: defaultEvaluationConfig.description,
       isActive: true,
       isDefault: true,
-      useCriterionWeights: true,
-      evaluationPeriod: '2026-Q2',
-      scaleMin: 1,
-      scaleMax: 5,
-      scoreOptions: [
-        { value: 1, label: 'Rất kém', sortOrder: 1, isActive: true },
-        { value: 2, label: 'Kém', sortOrder: 2, isActive: true },
-        { value: 3, label: 'Đạt', sortOrder: 3, isActive: true },
-        { value: 4, label: 'Tốt', sortOrder: 4, isActive: true },
-        { value: 5, label: 'Xuất sắc', sortOrder: 5, isActive: true },
-      ].map((item) => Object.assign(new ScoreOption(), item)),
-      rankRules: [
-        { code: 'A', name: 'Xuất sắc', color: '#16a34a', minScore: 85, maxScore: 100, sortOrder: 1, isActive: true },
-        { code: 'B', name: 'Tốt', color: '#2563eb', minScore: 70, maxScore: 84.99, sortOrder: 2, isActive: true },
-        { code: 'C', name: 'Cần cải thiện', color: '#f59e0b', minScore: 55, maxScore: 69.99, sortOrder: 3, isActive: true },
-        { code: 'D', name: 'Không đạt', color: '#dc2626', minScore: 0, maxScore: 54.99, sortOrder: 4, isActive: true },
-      ].map((item) => Object.assign(new RankRule(), item)),
-      groups: this.buildGroups(),
+      useCriterionWeights: defaultEvaluationConfig.useCriterionWeights,
+      evaluationPeriod: defaultEvaluationConfig.evaluationPeriod,
+      scaleMin: defaultEvaluationConfig.scaleMin,
+      scaleMax: defaultEvaluationConfig.scaleMax,
+      scoreOptions: defaultEvaluationConfig.scoreOptions.map((item) =>
+        Object.assign(new ScoreOption(), item),
+      ),
+      rankRules: defaultEvaluationConfig.rankRules.map((item) =>
+        Object.assign(new RankRule(), item),
+      ),
+      groups: defaultEvaluationConfig.groups.map((group, groupIndex) =>
+        Object.assign(new EvaluationGroup(), {
+          code: group.code,
+          name: group.name,
+          weight: group.weight,
+          sortOrder: groupIndex + 1,
+          isActive: true,
+          criteria: group.criteria.map((criterion, criterionIndex) =>
+            Object.assign(new EvaluationCriterion(), {
+              code: criterion.code,
+              name: criterion.name,
+              description: criterion.description,
+              layer1Code: criterion.layer1Code,
+              layer1Name: criterion.layer1Name,
+              applicableType: criterion.applicableType,
+              reference: criterion.reference,
+              source: criterion.source,
+              weight: criterion.weight,
+              sortOrder: criterionIndex + 1,
+              isActive: true,
+            }),
+          ),
+        }),
+      ),
     });
     this.scoring.validateConfig(config);
     return this.configs.save(config);
-  }
-
-  private buildGroups() {
-    const groups = [
-      {
-        code: 'A',
-        name: 'Năng lực kỹ thuật',
-        weight: 25,
-        criteria: [
-          ['A1', 'Chất lượng giải pháp', 40],
-          ['A2', 'Năng lực đội ngũ kỹ thuật', 35],
-          ['A3', 'Khả năng tích hợp và mở rộng', 25],
-        ],
-      },
-      {
-        code: 'B',
-        name: 'Chất lượng dịch vụ',
-        weight: 30,
-        criteria: [
-          ['B1', 'Tuân thủ SLA', 35],
-          ['B2', 'Tốc độ phản hồi sự cố', 30],
-          ['B3', 'Chất lượng hỗ trợ người dùng', 20],
-          ['B4', 'Quản lý thay đổi', 15],
-        ],
-      },
-      {
-        code: 'C',
-        name: 'Chi phí và thương mại',
-        weight: 30,
-        criteria: [
-          ['C1', 'Tính cạnh tranh về giá', 35],
-          ['C2', 'Minh bạch chi phí', 25],
-          ['C3', 'Linh hoạt hợp đồng', 20],
-          ['C4', 'Tối ưu tổng chi phí sở hữu', 20],
-        ],
-      },
-      {
-        code: 'D',
-        name: 'Rủi ro và tuân thủ',
-        weight: 15,
-        criteria: [
-          ['D1', 'An toàn thông tin', 40],
-          ['D2', 'Tuân thủ pháp lý và quy định', 35],
-          ['D3', 'Khả năng liên tục kinh doanh', 25],
-        ],
-      },
-    ];
-
-    return groups.map((group, groupIndex) =>
-      Object.assign(new EvaluationGroup(), {
-        code: group.code,
-        name: group.name,
-        weight: group.weight,
-        sortOrder: groupIndex + 1,
-        isActive: true,
-        criteria: group.criteria.map(([code, name, weight], criterionIndex) =>
-          Object.assign(new EvaluationCriterion(), {
-            code,
-            name,
-            weight,
-            sortOrder: criterionIndex + 1,
-            isActive: true,
-          }),
-        ),
-      }),
-    );
   }
 
   private seedSuppliers() {
@@ -220,31 +171,24 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
       relations: { groups: { criteria: true }, scoreOptions: true, rankRules: true },
     });
 
-    const scoreSets = [
-      [5, 5, 4, 5, 4, 5, 4, 4, 4, 5, 5, 5, 4, 5],
-      [4, 4, 4, 4, 4, 3, 4, 4, 4, 4, 3, 4, 4, 4],
-      [3, 3, 4, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3],
-      [2, 3, 3, 2, 3, 2, 3, 3, 2, 3, 2, 3, 2, 3],
-    ];
-
     const criteria = fullConfig.groups
       .sort((left, right) => left.sortOrder - right.sortOrder)
       .flatMap((group) => group.criteria.sort((left, right) => left.sortOrder - right.sortOrder));
 
-    for (let index = 0; index < suppliers.length; index += 1) {
-      const supplier = suppliers[index];
+    for (let supplierIndex = 0; supplierIndex < suppliers.length; supplierIndex += 1) {
+      const supplier = suppliers[supplierIndex];
       const items = criteria.map((criterion, criterionIndex) => ({
         criterionId: criterion.id,
-        score: scoreSets[index][criterionIndex],
-        note: 'Dữ liệu đánh giá khởi tạo',
+        score: this.sampleScore(supplierIndex, criterionIndex),
+        note: 'Dữ liệu đánh giá khởi tạo theo bộ tiêu chí 17062026',
       }));
       const result = this.scoring.calculate(fullConfig, items);
       const evaluation = await this.evaluations.save(
         this.evaluations.create({
           supplierId: supplier.id,
           configId: fullConfig.id,
-          period: '2026-Q2',
-          evaluator: 'anhth12',
+          period: fullConfig.evaluationPeriod,
+          evaluator: 'Ban đánh giá CNTT',
           totalScore: result.totalScore,
           rankCode: result.rank.code,
           rankName: result.rank.name,
@@ -267,5 +211,12 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
       supplier.lastEvaluatedAt = evaluation.createdAt;
       await this.suppliers.save(supplier);
     }
+  }
+
+  private sampleScore(supplierIndex: number, criterionIndex: number) {
+    if (supplierIndex === 0) return 4 + ((criterionIndex + 1) % 2);
+    if (supplierIndex === 1) return 3 + ((criterionIndex + 1) % 3);
+    if (supplierIndex === 2) return 2 + ((criterionIndex + 1) % 3);
+    return 1 + ((criterionIndex + 1) % 3);
   }
 }

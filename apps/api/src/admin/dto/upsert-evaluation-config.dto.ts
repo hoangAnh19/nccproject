@@ -31,6 +31,26 @@ export class UpsertCriterionDto {
   @IsString()
   description?: string;
 
+  @IsOptional()
+  @IsString()
+  layer1Code?: string;
+
+  @IsOptional()
+  @IsString()
+  layer1Name?: string;
+
+  @IsOptional()
+  @IsString()
+  applicableType?: string;
+
+  @IsOptional()
+  @IsString()
+  reference?: string;
+
+  @IsOptional()
+  @IsString()
+  source?: string;
+
   @IsNumber()
   @Min(0)
   @Max(100)

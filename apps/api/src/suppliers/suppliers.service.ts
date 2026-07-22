@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Supplier } from '../database/entities';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
@@ -59,7 +59,7 @@ export class SuppliersService {
     };
 
     const sortColumn = sortFieldMap[filters.sortBy ?? ''] || 'supplier.createdAt';
-    const sortDir = (filters.sortOrder?.toUpperCase() === 'ASC') ? 'ASC' : 'DESC';
+    const sortDir = filters.sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
     qb.orderBy(sortColumn, sortDir);
     if (sortColumn !== 'supplier.createdAt') {
