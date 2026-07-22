@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { Save, Search } from 'lucide-react';
+import { ChevronDown, ChevronRight, ChevronsDown, ChevronsUp, Save, Search } from 'lucide-react';
 import { apiFetch, formatScore } from '@/lib/api';
 import type { Evaluation, EvaluationConfig, Supplier } from '@/lib/types';
 import { EmptyState, ErrorState, LoadingState } from '@/components/state';
@@ -46,6 +46,10 @@ export default function EvaluationsPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // Collapse states for groups and sub-layers
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
+  const [collapsedLayers, setCollapsedLayers] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     Promise.all([
@@ -122,6 +126,34 @@ export default function EvaluationsPage() {
     const rank = config.rankRules.find((rule) => totalScore >= rule.minScore && totalScore <= rule.maxScore);
     return { totalScore, rank, groupScores };
   }, [config, scores]);
+
+  const toggleGroup = (groupId: string) => {
+    setCollapsedGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
+  };
+
+  const toggleLayer = (layerCode: string) => {
+    setCollapsedLayers((prev) => ({ ...prev, [layerCode]: !prev[layerCode] }));
+  };
+
+  const handleExpandAll = () => {
+    setCollapsedGroups({});
+    setCollapsedLayers({});
+  };
+
+  const handleCollapseAll = () => {
+    if (!config) return;
+    const nextGroups: Record<string, boolean> = {};
+    const nextLayers: Record<string, boolean> = {};
+    config.groups.forEach((group) => {
+      nextGroups[group.id] = true;
+      const layers = groupCriteriaByLayer(group.criteria);
+      layers.forEach((layer) => {
+        nextLayers[layer.code] = true;
+      });
+    });
+    setCollapsedGroups(nextGroups);
+    setCollapsedLayers(nextLayers);
+  };
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -226,74 +258,151 @@ export default function EvaluationsPage() {
 
           {filteredSuppliers.length === 0 && <EmptyState message="Không tìm thấy nhà cung cấp phù hợp để đánh giá" />}
 
-          {config.groups.map((group) => (
-            <div key={group.id} className="rounded-md border border-line bg-white">
-              <div className="flex items-center justify-between border-b border-line px-4 py-3">
-                <h2 className="font-semibold text-ink">
-                  {group.code}. {group.name}
-                </h2>
-                <span className="text-sm text-slate-600">Trọng số nhóm {group.weight}%</span>
-              </div>
-              <div className="divide-y divide-line">
-                {groupCriteriaByLayer(group.criteria).map((layer) => (
-                  <div key={layer.code}>
-                    <div className="bg-slate-50 px-4 py-3 text-sm font-semibold text-ink">
-                      {layer.code}. {layer.name}
-                    </div>
-                    <div className="divide-y divide-line">
-                      {layer.criteria.map((criterion) => (
-                        <div key={criterion.id} className="grid gap-3 px-4 py-3 lg:grid-cols-[1fr_220px_1fr]">
-                          <div>
-                            <div className="font-medium text-ink">
-                              {criterion.code}. {criterion.name}
-                            </div>
-                            <div className="mt-1 text-xs text-slate-500">
-                              Trọng số {formatScore(criterion.weight)}% · Áp dụng: {criterion.applicableType ?? 'Tất cả'}
-                            </div>
-                            {criterion.description && (
-                              <div className="mt-2 whitespace-pre-line text-xs leading-5 text-slate-600">
-                                {criterion.description}
-                              </div>
-                            )}
-                          </div>
-                          <select
-                            value={scores[criterion.id]?.score ?? config.scaleMin}
-                            onChange={(event) =>
-                              setScores({
-                                ...scores,
-                                [criterion.id]: { ...scores[criterion.id], score: Number(event.target.value) },
-                              })
-                            }
-                            className="focus-ring rounded-md border border-line px-3 py-2 text-sm"
-                          >
-                            {config.scoreOptions.map((option) => (
-                              <option key={option.id} value={option.value}>
-                                {option.value} - {option.label}
-                              </option>
-                            ))}
-                          </select>
-                          <input
-                            value={scores[criterion.id]?.note ?? ''}
-                            onChange={(event) =>
-                              setScores({
-                                ...scores,
-                                [criterion.id]: { ...scores[criterion.id], note: event.target.value },
-                              })
-                            }
-                            placeholder="Ghi chú tiêu chí"
-                            className="focus-ring rounded-md border border-line px-3 py-2 text-sm"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {/* Quick Collapse / Expand All controls */}
+          <div className="flex items-center justify-between px-1 text-xs text-slate-500">
+            <span className="font-semibold text-slate-700">Các nhóm tiêu chí đánh giá ({config.groups.length} nhóm)</span>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleExpandAll}
+                className="flex items-center gap-1 font-medium text-accent hover:underline"
+              >
+                <ChevronsDown size={14} />
+                Mở rộng tất cả
+              </button>
+              <button
+                type="button"
+                onClick={handleCollapseAll}
+                className="flex items-center gap-1 font-medium text-slate-600 hover:underline"
+              >
+                <ChevronsUp size={14} />
+                Thu gọn tất cả
+              </button>
             </div>
-          ))}
+          </div>
+
+          {config.groups.map((group) => {
+            const isGroupCollapsed = Boolean(collapsedGroups[group.id]);
+            const layers = groupCriteriaByLayer(group.criteria);
+            const totalCriteriaCount = group.criteria.length;
+
+            return (
+              <div key={group.id} className="rounded-md border border-line bg-white shadow-2xs overflow-hidden">
+                {/* Group Header - Clickable to collapse */}
+                <div
+                  onClick={() => toggleGroup(group.id)}
+                  className="flex cursor-pointer items-center justify-between border-b border-line bg-slate-50/80 px-4 py-3 hover:bg-slate-100/80 transition select-none"
+                >
+                  <div className="flex items-center gap-2">
+                    {isGroupCollapsed ? (
+                      <ChevronRight size={18} className="text-slate-500" />
+                    ) : (
+                      <ChevronDown size={18} className="text-slate-500" />
+                    )}
+                    <h2 className="font-semibold text-ink">
+                      {group.code}. {group.name}
+                    </h2>
+                    <span className="rounded bg-slate-200 px-2 py-0.5 text-xs text-slate-600 font-medium">
+                      {totalCriteriaCount} tiêu chí
+                    </span>
+                  </div>
+                  <span className="text-sm font-semibold text-slate-600">Trọng số nhóm {group.weight}%</span>
+                </div>
+
+                {/* Group Content */}
+                {!isGroupCollapsed && (
+                  <div className="divide-y divide-line">
+                    {layers.map((layer) => {
+                      const isLayerCollapsed = Boolean(collapsedLayers[layer.code]);
+                      return (
+                        <div key={layer.code}>
+                          {/* Layer Sub-header */}
+                          <div
+                            onClick={() => toggleLayer(layer.code)}
+                            className="flex cursor-pointer items-center justify-between bg-slate-100/60 px-4 py-2.5 text-sm font-semibold text-ink hover:bg-slate-200/60 transition select-none pl-6"
+                          >
+                            <div className="flex items-center gap-2">
+                              {isLayerCollapsed ? (
+                                <ChevronRight size={16} className="text-slate-400" />
+                              ) : (
+                                <ChevronDown size={16} className="text-slate-400" />
+                              )}
+                              <span>
+                                {layer.code}. {layer.name}
+                              </span>
+                            </div>
+                            <span className="text-xs font-normal text-slate-500">
+                              {layer.criteria.length} tiêu chí
+                            </span>
+                          </div>
+
+                          {/* Criteria list inside layer */}
+                          {!isLayerCollapsed && (
+                            <div className="divide-y divide-line">
+                              {layer.criteria.map((criterion) => (
+                                <div key={criterion.id} className="grid gap-3 px-4 py-3 lg:grid-cols-[1fr_220px_1fr] pl-8">
+                                  <div>
+                                    <div className="font-medium text-ink">
+                                      {criterion.code}. {criterion.name}
+                                    </div>
+                                    <div className="mt-1 text-xs text-slate-500">
+                                      Trọng số {formatScore(criterion.weight)}% · Áp dụng:{' '}
+                                      {criterion.applicableType ?? 'Tất cả'}
+                                    </div>
+                                    {criterion.description && (
+                                      <div className="mt-2 whitespace-pre-line text-xs leading-5 text-slate-600">
+                                        {criterion.description}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <select
+                                    value={scores[criterion.id]?.score ?? config.scaleMin}
+                                    onChange={(event) =>
+                                      setScores({
+                                        ...scores,
+                                        [criterion.id]: {
+                                          ...scores[criterion.id],
+                                          score: Number(event.target.value),
+                                        },
+                                      })
+                                    }
+                                    className="focus-ring rounded-md border border-line px-3 py-2 text-sm bg-white"
+                                  >
+                                    {config.scoreOptions.map((option) => (
+                                      <option key={option.id} value={option.value}>
+                                        {option.value} - {option.label}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <input
+                                    value={scores[criterion.id]?.note ?? ''}
+                                    onChange={(event) =>
+                                      setScores({
+                                        ...scores,
+                                        [criterion.id]: {
+                                          ...scores[criterion.id],
+                                          note: event.target.value,
+                                        },
+                                      })
+                                    }
+                                    placeholder="Ghi chú tiêu chí"
+                                    className="focus-ring rounded-md border border-line px-3 py-2 text-sm"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </section>
 
-        <aside className="h-fit rounded-md border border-line bg-white p-5">
+        <aside className="h-fit rounded-md border border-line bg-white p-5 sticky top-4">
           <h2 className="font-semibold text-ink">Preview tạm</h2>
           <div className="mt-4 text-4xl font-bold text-ink">{preview ? formatScore(preview.totalScore) : '0.00'}</div>
           <div className="mt-2">

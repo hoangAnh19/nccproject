@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Award, Calendar, CheckCircle2, Clock, User, X } from 'lucide-react';
+import { Award, Calendar, CheckCircle2, ChevronDown, ChevronRight, ChevronsDown, ChevronsUp, Clock, User, X } from 'lucide-react';
 import { apiFetch, formatScore } from '@/lib/api';
 import type { Evaluation, Supplier } from '@/lib/types';
 import { EmptyState, LoadingState } from './state';
@@ -249,6 +249,10 @@ export function SupplierDetailModal({ supplierId, onClose }: SupplierDetailModal
 }
 
 function EvaluationDetailView({ evaluation, isCurrent }: { evaluation: Evaluation | null; isCurrent?: boolean }) {
+  const [showGroupBreakdown, setShowGroupBreakdown] = useState(true);
+  const [showCriteriaTable, setShowCriteriaTable] = useState(true);
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
+
   if (!evaluation) {
     return (
       <EmptyState
@@ -259,6 +263,22 @@ function EvaluationDetailView({ evaluation, isCurrent }: { evaluation: Evaluatio
         }
       />
     );
+  }
+
+  const toggleSection = (code: string) => {
+    setCollapsedSections((prev) => ({ ...prev, [code]: !prev[code] }));
+  };
+
+  // Group items by criterion group / layer code
+  const itemsByGroup = new Map<string, { groupName: string; items: typeof evaluation.items }>();
+  if (evaluation.items) {
+    evaluation.items.forEach((item) => {
+      const groupCode = item.criterion?.layer1Code ?? item.criterion?.code?.split('.')[0] ?? 'Khác';
+      const groupName = item.criterion?.layer1Name ?? `Nhóm ${groupCode}`;
+      const current = itemsByGroup.get(groupCode) ?? { groupName, items: [] };
+      current.items!.push(item);
+      itemsByGroup.set(groupCode, current);
+    });
   }
 
   return (
@@ -293,61 +313,115 @@ function EvaluationDetailView({ evaluation, isCurrent }: { evaluation: Evaluatio
         </div>
       </div>
 
-      {/* Group Scores Breakdown */}
-      <div>
-        <h4 className="text-sm font-bold text-ink mb-2">Điểm theo nhóm tiêu chí</h4>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {evaluation.groupScores?.map((group) => (
-            <div key={group.groupId} className="rounded-md border border-line bg-white p-3 text-sm">
-              <div className="flex items-center justify-between font-semibold">
-                <span className="text-ink">
-                  {group.code}. {group.name}
-                </span>
-                <span className="text-accent">{formatScore(group.score)}</span>
-              </div>
-              <div className="mt-1.5 flex items-center gap-2">
-                <div className="h-2 flex-1 rounded-full bg-slate-100 overflow-hidden">
-                  <div className="h-2 rounded-full bg-accent" style={{ width: `${Math.min(group.score, 100)}%` }} />
-                </div>
-                <span className="text-xs text-slate-500 font-medium">Trọng số {group.weight}%</span>
-              </div>
-            </div>
-          ))}
+      {/* Group Scores Breakdown (Collapsible) */}
+      <div className="rounded-md border border-line bg-white overflow-hidden">
+        <div
+          onClick={() => setShowGroupBreakdown(!showGroupBreakdown)}
+          className="flex cursor-pointer items-center justify-between bg-slate-50 px-4 py-3 border-b border-line hover:bg-slate-100 transition select-none"
+        >
+          <div className="flex items-center gap-2 font-bold text-ink text-sm">
+            {showGroupBreakdown ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+            Điểm theo nhóm tiêu chí ({evaluation.groupScores?.length ?? 0} nhóm)
+          </div>
+          <span className="text-xs font-medium text-slate-500">
+            {showGroupBreakdown ? 'Thu gọn' : 'Mở rộng'}
+          </span>
         </div>
+        {showGroupBreakdown && (
+          <div className="p-4 grid gap-3 sm:grid-cols-2">
+            {evaluation.groupScores?.map((group) => (
+              <div key={group.groupId} className="rounded-md border border-line bg-slate-50/50 p-3 text-sm">
+                <div className="flex items-center justify-between font-semibold">
+                  <span className="text-ink">
+                    {group.code}. {group.name}
+                  </span>
+                  <span className="text-accent">{formatScore(group.score)}</span>
+                </div>
+                <div className="mt-1.5 flex items-center gap-2">
+                  <div className="h-2 flex-1 rounded-full bg-slate-200 overflow-hidden">
+                    <div className="h-2 rounded-full bg-accent" style={{ width: `${Math.min(group.score, 100)}%` }} />
+                  </div>
+                  <span className="text-xs text-slate-500 font-medium">Trọng số {group.weight}%</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Criteria Score Items Detail Table */}
+      {/* Criteria Score Items Detail Table (Collapsible by Group) */}
       {evaluation.items && evaluation.items.length > 0 && (
-        <div>
-          <h4 className="text-sm font-bold text-ink mb-2">Bảng điểm tiêu chí chi tiết</h4>
-          <div className="overflow-hidden rounded-md border border-line bg-white">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 uppercase text-slate-500 border-b border-line">
-                <tr>
-                  <th className="px-3 py-2">Tiêu chí</th>
-                  <th className="px-3 py-2 text-center">Điểm gốc</th>
-                  <th className="px-3 py-2 text-right">Điểm quy đổi</th>
-                  <th className="px-3 py-2">Ghi chú</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-line">
-                {evaluation.items.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50">
-                    <td className="px-3 py-2 font-medium text-slate-800">
-                      {item.criterion ? `${item.criterion.code}. ${item.criterion.name}` : 'Tiêu chí'}
-                    </td>
-                    <td className="px-3 py-2 text-center font-semibold text-ink">{item.score}</td>
-                    <td className="px-3 py-2 text-right font-bold text-accent">
-                      {formatScore(item.normalizedScore)}
-                    </td>
-                    <td className="px-3 py-2 text-slate-500 italic">
-                      {item.note || '-'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <div className="rounded-md border border-line bg-white overflow-hidden">
+          <div
+            onClick={() => setShowCriteriaTable(!showCriteriaTable)}
+            className="flex cursor-pointer items-center justify-between bg-slate-50 px-4 py-3 border-b border-line hover:bg-slate-100 transition select-none"
+          >
+            <div className="flex items-center gap-2 font-bold text-ink text-sm">
+              {showCriteriaTable ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+              Bảng điểm tiêu chí chi tiết ({evaluation.items.length} mục)
+            </div>
+            <span className="text-xs font-medium text-slate-500">
+              {showCriteriaTable ? 'Thu gọn tất cả' : 'Mở rộng tất cả'}
+            </span>
           </div>
+
+          {showCriteriaTable && (
+            <div className="divide-y divide-line">
+              {[...itemsByGroup.entries()].map(([gCode, gData]) => {
+                const isCollapsed = Boolean(collapsedSections[gCode]);
+                return (
+                  <div key={gCode}>
+                    {/* Sub-header for group section inside criteria table */}
+                    <div
+                      onClick={() => toggleSection(gCode)}
+                      className="flex cursor-pointer items-center justify-between bg-slate-100/70 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200/70 transition select-none"
+                    >
+                      <div className="flex items-center gap-2">
+                        {isCollapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
+                        <span>
+                          {gCode}. {gData.groupName}
+                        </span>
+                      </div>
+                      <span className="font-medium text-slate-500">
+                        {gData.items?.length ?? 0} tiêu chí
+                      </span>
+                    </div>
+
+                    {!isCollapsed && (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-slate-50/50 uppercase text-slate-400 border-b border-line">
+                            <tr>
+                              <th className="px-4 py-2">Tiêu chí</th>
+                              <th className="px-4 py-2 text-center">Điểm gốc</th>
+                              <th className="px-4 py-2 text-right">Điểm quy đổi</th>
+                              <th className="px-4 py-2">Ghi chú</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-line">
+                            {gData.items?.map((item) => (
+                              <tr key={item.id} className="hover:bg-slate-50/80">
+                                <td className="px-4 py-2 font-medium text-slate-800">
+                                  {item.criterion ? `${item.criterion.code}. ${item.criterion.name}` : 'Tiêu chí'}
+                                </td>
+                                <td className="px-4 py-2 text-center font-semibold text-ink">{item.score}</td>
+                                <td className="px-4 py-2 text-right font-bold text-accent">
+                                  {formatScore(item.normalizedScore)}
+                                </td>
+                                <td className="px-4 py-2 text-slate-500 italic">
+                                  {item.note || '-'}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
     </div>
