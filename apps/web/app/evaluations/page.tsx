@@ -19,7 +19,7 @@ export default function EvaluationsPage() {
   const [supplierQuery, setSupplierQuery] = useState('');
   const [periodSearch, setPeriodSearch] = useState('');
   const [period, setPeriod] = useState('');
-  const [evaluator, setEvaluator] = useState('Ban đánh giá CNTT');
+  const [evaluator, setEvaluator] = useState('anhth12');
   const [scores, setScores] = useState<Scores>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

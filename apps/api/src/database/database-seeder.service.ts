@@ -244,7 +244,7 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
           supplierId: supplier.id,
           configId: fullConfig.id,
           period: '2026-Q2',
-          evaluator: 'Ban đánh giá CNTT',
+          evaluator: 'anhth12',
           totalScore: result.totalScore,
           rankCode: result.rank.code,
           rankName: result.rank.name,
