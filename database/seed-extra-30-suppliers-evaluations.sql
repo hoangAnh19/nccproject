@@ -4,6 +4,9 @@
 -- Script lấy config mặc định, criteria và rank_rules từ database hiện tại.
 -- Có thể chạy lại nhiều lần: không insert trùng supplier code và không insert trùng evaluation theo supplier + period.
 
+SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
+SET CHARACTER SET utf8mb4;
+
 DELIMITER //
 
 DROP PROCEDURE IF EXISTS seed_extra_supplier_evaluations//

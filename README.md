@@ -76,7 +76,13 @@ Khi database trống, API tự seed:
 Seed bổ sung 30 nhà cung cấp và các kỳ 2025/2026:
 
 ```bash
-docker compose exec -T mysql mysql -uncc_user -pncc_pass ncc_db < database/seed-extra-30-suppliers-evaluations.sql
+docker compose exec -T mysql mysql --default-character-set=utf8mb4 -uncc_user -pncc_pass ncc_db < database/seed-extra-30-suppliers-evaluations.sql
+```
+
+Nếu đã từng import sai charset và thấy tiếng Việt thành `?`, chạy repair:
+
+```bash
+docker compose exec -T mysql mysql --default-character-set=utf8mb4 -uncc_user -pncc_pass ncc_db < database/repair-vietnamese-seed-extra.sql
 ```
 
 ## Endpoint chính
