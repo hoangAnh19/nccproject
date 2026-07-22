@@ -8,8 +8,15 @@ export class SuppliersController {
   constructor(private readonly suppliersService: SuppliersService) {}
 
   @Get()
-  findAll(@Query('search') search?: string, @Query('type') type?: string, @Query('rank') rank?: string) {
-    return this.suppliersService.findAll({ search, type, rank });
+  findAll(
+    @Query('search') search?: string,
+    @Query('type') type?: string,
+    @Query('rank') rank?: string,
+    @Query('status') status?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
+  ) {
+    return this.suppliersService.findAll({ search, type, rank, status, sortBy, sortOrder });
   }
 
   @Get(':id')

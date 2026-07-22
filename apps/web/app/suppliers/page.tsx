@@ -1,10 +1,23 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { Plus, RefreshCw, Search, Trash2 } from 'lucide-react';
+import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Eye,
+  Filter,
+  Pencil,
+  Plus,
+  RefreshCw,
+  RotateCcw,
+  Search,
+  Trash2,
+} from 'lucide-react';
 import { apiFetch, formatScore } from '@/lib/api';
 import type { Supplier } from '@/lib/types';
 import { EmptyState, ErrorState, LoadingState } from '@/components/state';
+import { SupplierDetailModal } from '@/components/supplier-detail-modal';
 
 const emptyForm = {
   code: '',
@@ -20,41 +33,149 @@ const emptyForm = {
 
 export default function SuppliersPage() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [allSuppliers, setAllSuppliers] = useState<Supplier[]>([]);
   const [search, setSearch] = useState('');
   const [type, setType] = useState('');
   const [rank, setRank] = useState('');
+  const [status, setStatus] = useState('');
+  const [sortBy, setSortBy] = useState('createdAt');
+  const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
+  const [highlightId, setHighlightId] = useState<string | null>(null);
+  const [detailSupplierId, setDetailSupplierId] = useState<string | null>(null);
+
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  const load = (filters = { search, type, rank }) => {
-    setLoading(true);
-    const params = new URLSearchParams();
-    if (filters.search) params.set('search', filters.search);
-    if (filters.type) params.set('type', filters.type);
-    if (filters.rank) params.set('rank', filters.rank);
-    apiFetch<Supplier[]>(`/suppliers?${params.toString()}`)
-      .then(setSuppliers)
-      .catch((err: Error) => setError(err.message))
-      .finally(() => setLoading(false));
-  };
+  const load = useCallback(
+    (customParams?: {
+      search?: string;
+      type?: string;
+      rank?: string;
+      status?: string;
+      sortBy?: string;
+      sortOrder?: 'ASC' | 'DESC';
+    }) => {
+      setLoading(true);
+      const querySearch = customParams?.search ?? search;
+      const queryType = customParams?.type ?? type;
+      const queryRank = customParams?.rank ?? rank;
+      const queryStatus = customParams?.status ?? status;
+      const querySortBy = customParams?.sortBy ?? sortBy;
+      const querySortOrder = customParams?.sortOrder ?? sortOrder;
+
+      const params = new URLSearchParams();
+      if (querySearch) params.set('search', querySearch);
+      if (queryType) params.set('type', queryType);
+      if (queryRank) params.set('rank', queryRank);
+      if (queryStatus) params.set('status', queryStatus);
+      if (querySortBy) params.set('sortBy', querySortBy);
+      if (querySortOrder) params.set('sortOrder', querySortOrder);
+
+      // Sync URL without full page refresh
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState(null, '', newUrl);
+
+      apiFetch<Supplier[]>(`/suppliers?${params.toString()}`)
+        .then(setSuppliers)
+        .catch((err: Error) => setError(err.message))
+        .finally(() => setLoading(false));
+    },
+    [search, type, rank, status, sortBy, sortOrder],
+  );
+
+  // Load baseline list to populate unique dropdown options
+  useEffect(() => {
+    apiFetch<Supplier[]>('/suppliers')
+      .then((data) => setAllSuppliers(data))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const initialSearch = params.get('search') ?? '';
+    const initialType = params.get('type') ?? '';
+    const initialRank = params.get('rank') ?? '';
+    const initialStatus = params.get('status') ?? '';
+    const initialSortBy = params.get('sortBy') ?? 'createdAt';
+    const initialSortOrder = (params.get('sortOrder')?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC') as 'ASC' | 'DESC';
+    const initialHighlight = params.get('highlight');
+    const initialId = params.get('id');
+
     setSearch(initialSearch);
-    load({ search: initialSearch, type: '', rank: '' });
-  }, []);
+    setType(initialType);
+    setRank(initialRank);
+    setStatus(initialStatus);
+    setSortBy(initialSortBy);
+    setSortOrder(initialSortOrder);
+    if (initialHighlight) setHighlightId(initialHighlight);
+    if (initialId) setDetailSupplierId(initialId);
 
-  const supplierTypes = useMemo(() => [...new Set(suppliers.map((supplier) => supplier.type))], [suppliers]);
-  const ranks = useMemo(
-    () => [...new Set(suppliers.map((supplier) => supplier.latestRankCode).filter(Boolean))],
-    [suppliers],
-  );
+    load({
+      search: initialSearch,
+      type: initialType,
+      rank: initialRank,
+      status: initialStatus,
+      sortBy: initialSortBy,
+      sortOrder: initialSortOrder,
+    });
+  }, [load]);
 
-  const submit = async (event: FormEvent) => {
+  const supplierTypes = useMemo(() => {
+    const set = new Set(allSuppliers.map((s) => s.type).concat(suppliers.map((s) => s.type)));
+    return [...set].filter(Boolean);
+  }, [allSuppliers, suppliers]);
+
+  const ranks = useMemo(() => {
+    const set = new Set(
+      allSuppliers
+        .map((s) => s.latestRankCode)
+        .concat(suppliers.map((s) => s.latestRankCode))
+        .filter(Boolean),
+    );
+    return [...set] as string[];
+  }, [allSuppliers, suppliers]);
+
+  const handleHeaderSort = (field: string) => {
+    let nextOrder: 'ASC' | 'DESC' = 'ASC';
+    if (sortBy === field) {
+      nextOrder = sortOrder === 'ASC' ? 'DESC' : 'ASC';
+    } else if (field === 'latestScore' || field === 'createdAt') {
+      nextOrder = 'DESC';
+    }
+    setSortBy(field);
+    setSortOrder(nextOrder);
+    load({ sortBy: field, sortOrder: nextOrder });
+  };
+
+  const handleFilterSubmit = (e?: FormEvent) => {
+    if (e) e.preventDefault();
+    load();
+  };
+
+  const handleResetFilters = () => {
+    setSearch('');
+    setType('');
+    setRank('');
+    setStatus('');
+    setSortBy('createdAt');
+    setSortOrder('DESC');
+    setHighlightId(null);
+    load({
+      search: '',
+      type: '',
+      rank: '',
+      status: '',
+      sortBy: 'createdAt',
+      sortOrder: 'DESC',
+    });
+  };
+
+  const isFiltered = Boolean(search || type || rank || status || sortBy !== 'createdAt' || sortOrder !== 'DESC');
+
+  const submitForm = async (event: FormEvent) => {
     event.preventDefault();
     setSaving(true);
     setError('');
@@ -100,12 +221,12 @@ export default function SuppliersPage() {
         <div>
           <h1 className="text-2xl font-bold text-ink">Nhà cung cấp</h1>
           <p className="mt-1 text-sm text-slate-600">
-            Tìm kiếm, lọc, thêm và cập nhật hồ sơ nhà cung cấp CNTT.
+            Tìm kiếm, lọc, sắp xếp, xem chi tiết điểm đánh giá và cập nhật hồ sơ nhà cung cấp CNTT.
           </p>
         </div>
         <button
           onClick={() => load()}
-          className="focus-ring flex items-center gap-2 rounded-md border border-line bg-white px-3 py-2 text-sm"
+          className="focus-ring flex items-center gap-2 rounded-md border border-line bg-white px-3 py-2 text-sm hover:bg-slate-50 transition"
         >
           <RefreshCw size={16} />
           Tải lại
@@ -114,8 +235,20 @@ export default function SuppliersPage() {
 
       {error && <ErrorState message={error} />}
 
+      {/* Detail Modal */}
+      {detailSupplierId && (
+        <SupplierDetailModal
+          supplierId={detailSupplierId}
+          onClose={() => setDetailSupplierId(null)}
+        />
+      )}
+
+      {/* Accordion/Card for Form */}
       <section className="rounded-md border border-line bg-white p-4">
-        <form onSubmit={submit} className="grid gap-3 lg:grid-cols-4">
+        <h2 className="mb-3 text-sm font-semibold text-ink">
+          {editingId ? 'Chỉnh sửa nhà cung cấp' : 'Thêm nhà cung cấp mới'}
+        </h2>
+        <form onSubmit={submitForm} className="grid gap-3 lg:grid-cols-4">
           <Input label="Mã NCC" value={form.code} onChange={(value) => setForm({ ...form, code: value })} required />
           <Input
             label="Tên nhà cung cấp"
@@ -141,7 +274,7 @@ export default function SuppliersPage() {
           <div className="flex gap-2 lg:col-span-4">
             <button
               disabled={saving}
-              className="focus-ring flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+              className="focus-ring flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white disabled:opacity-60 hover:opacity-90 transition"
             >
               <Plus size={16} />
               {editingId ? 'Lưu thay đổi' : 'Thêm nhà cung cấp'}
@@ -153,7 +286,7 @@ export default function SuppliersPage() {
                   setEditingId(null);
                   setForm(emptyForm);
                 }}
-                className="rounded-md border border-line px-4 py-2 text-sm"
+                className="rounded-md border border-line px-4 py-2 text-sm hover:bg-slate-50"
               >
                 Hủy
               </button>
@@ -162,104 +295,283 @@ export default function SuppliersPage() {
         </form>
       </section>
 
-      <section className="rounded-md border border-line bg-white p-4">
-        <div className="grid gap-3 md:grid-cols-[1fr_180px_160px_auto]">
-          <label className="relative">
+      {/* Filter and Sort Toolbar */}
+      <section className="rounded-md border border-line bg-white p-4 space-y-3">
+        <form onSubmit={handleFilterSubmit} className="grid gap-3 md:grid-cols-12 items-center">
+          {/* Search */}
+          <div className="md:col-span-4 relative">
             <Search className="absolute left-3 top-2.5 text-slate-400" size={16} />
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') load();
-              }}
-              placeholder="Tìm theo tên, mã, mã số thuế"
+              placeholder="Tìm theo tên, mã, mã số thuế..."
               className="focus-ring w-full rounded-md border border-line py-2 pl-9 pr-3 text-sm"
             />
-          </label>
-          <select
-            value={type}
-            onChange={(event) => setType(event.target.value)}
-            className="focus-ring rounded-md border border-line px-3 py-2 text-sm"
-          >
-            <option value="">Tất cả loại hình</option>
-            {supplierTypes.map((item) => (
-              <option key={item}>{item}</option>
+          </div>
+
+          {/* Type Filter */}
+          <div className="md:col-span-2">
+            <select
+              value={type}
+              onChange={(event) => {
+                const val = event.target.value;
+                setType(val);
+                load({ type: val });
+              }}
+              className="focus-ring w-full rounded-md border border-line px-3 py-2 text-sm bg-white"
+            >
+              <option value="">Tất cả loại hình</option>
+              {supplierTypes.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Rank Filter */}
+          <div className="md:col-span-2">
+            <select
+              value={rank}
+              onChange={(event) => {
+                const val = event.target.value;
+                setRank(val);
+                load({ rank: val });
+              }}
+              className="focus-ring w-full rounded-md border border-line px-3 py-2 text-sm bg-white"
+            >
+              <option value="">Tất cả rank</option>
+              {ranks.map((item) => (
+                <option key={item} value={item}>
+                  Rank {item}
+                </option>
+              ))}
+              <option value="UNRATED">Chưa có rank</option>
+            </select>
+          </div>
+
+          {/* Status Filter */}
+          <div className="md:col-span-2">
+            <select
+              value={status}
+              onChange={(event) => {
+                const val = event.target.value;
+                setStatus(val);
+                load({ status: val });
+              }}
+              className="focus-ring w-full rounded-md border border-line px-3 py-2 text-sm bg-white"
+            >
+              <option value="">Tất cả trạng thái</option>
+              <option value="evaluated">Đã đánh giá</option>
+              <option value="unevaluated">Chưa đánh giá</option>
+            </select>
+          </div>
+
+          {/* Filter button */}
+          <div className="md:col-span-2 flex gap-2">
+            <button
+              type="submit"
+              className="focus-ring flex-1 flex items-center justify-center gap-1.5 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white hover:opacity-90 transition"
+            >
+              <Filter size={15} />
+              Lọc
+            </button>
+            {isFiltered && (
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                title="Xóa bộ lọc"
+                className="focus-ring flex items-center justify-center rounded-md border border-line bg-white px-2.5 py-2 text-sm text-slate-600 hover:bg-slate-100 transition"
+              >
+                <RotateCcw size={15} />
+              </button>
+            )}
+          </div>
+        </form>
+
+        {/* Sort Bar */}
+        <div className="flex flex-wrap items-center justify-between border-t border-line pt-3 text-sm gap-2">
+          <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
+            <span>Sắp xếp theo:</span>
+            {[
+              { id: 'createdAt', label: 'Ngày tạo' },
+              { id: 'name', label: 'Tên NCC' },
+              { id: 'code', label: 'Mã NCC' },
+              { id: 'type', label: 'Loại hình' },
+              { id: 'latestScore', label: 'Điểm đánh giá' },
+            ].map((option) => (
+              <button
+                key={option.id}
+                onClick={() => handleHeaderSort(option.id)}
+                className={`rounded px-2.5 py-1 transition ${
+                  sortBy === option.id
+                    ? 'bg-accent/10 font-semibold text-accent border border-accent/20'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                {option.label}
+                {sortBy === option.id && (
+                  <span className="ml-1 inline-block">
+                    {sortOrder === 'ASC' ? '↑' : '↓'}
+                  </span>
+                )}
+              </button>
             ))}
-          </select>
-          <select
-            value={rank}
-            onChange={(event) => setRank(event.target.value)}
-            className="focus-ring rounded-md border border-line px-3 py-2 text-sm"
+          </div>
+
+          <button
+            onClick={() => {
+              const nextOrder = sortOrder === 'ASC' ? 'DESC' : 'ASC';
+              setSortOrder(nextOrder);
+              load({ sortOrder: nextOrder });
+            }}
+            className="flex items-center gap-1.5 rounded border border-line bg-white px-2.5 py-1 text-xs text-slate-700 hover:bg-slate-50 transition"
           >
-            <option value="">Tất cả rank</option>
-            {ranks.map((item) => (
-              <option key={item ?? ''}>{item}</option>
-            ))}
-          </select>
-          <button onClick={() => load()} className="focus-ring rounded-md bg-ink px-4 py-2 text-sm font-semibold text-white">
-            Lọc
+            {sortOrder === 'ASC' ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
+            Thứ tự: {sortOrder === 'ASC' ? 'Tăng dần (A-Z)' : 'Giảm dần (Z-A)'}
           </button>
         </div>
       </section>
 
+      {/* Main Table / Results */}
       {loading ? (
-        <LoadingState />
+        <LoadingState label="Đang tải danh sách nhà cung cấp..." />
       ) : suppliers.length === 0 ? (
-        <EmptyState message="Không có nhà cung cấp phù hợp" />
+        <EmptyState message="Không có nhà cung cấp nào phù hợp với bộ lọc" />
       ) : (
-        <section className="overflow-hidden rounded-md border border-line bg-white">
+        <section className="overflow-hidden rounded-md border border-line bg-white shadow-sm">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+            <thead className="bg-slate-50 text-xs uppercase text-slate-500 border-b border-line">
               <tr>
-                <th className="px-4 py-3">Nhà cung cấp</th>
-                <th className="px-4 py-3">Loại hình</th>
-                <th className="px-4 py-3">MST</th>
-                <th className="px-4 py-3 text-right">Điểm</th>
+                <th
+                  onClick={() => handleHeaderSort('name')}
+                  className="px-4 py-3 cursor-pointer select-none hover:bg-slate-100 transition"
+                >
+                  <div className="flex items-center gap-1.5">
+                    Nhà cung cấp
+                    <SortIcon field="name" currentSortBy={sortBy} currentSortOrder={sortOrder} />
+                  </div>
+                </th>
+                <th
+                  onClick={() => handleHeaderSort('type')}
+                  className="px-4 py-3 cursor-pointer select-none hover:bg-slate-100 transition"
+                >
+                  <div className="flex items-center gap-1.5">
+                    Loại hình
+                    <SortIcon field="type" currentSortBy={sortBy} currentSortOrder={sortOrder} />
+                  </div>
+                </th>
+                <th
+                  onClick={() => handleHeaderSort('taxCode')}
+                  className="px-4 py-3 cursor-pointer select-none hover:bg-slate-100 transition"
+                >
+                  <div className="flex items-center gap-1.5">
+                    MST
+                    <SortIcon field="taxCode" currentSortBy={sortBy} currentSortOrder={sortOrder} />
+                  </div>
+                </th>
+                <th
+                  onClick={() => handleHeaderSort('latestScore')}
+                  className="px-4 py-3 text-right cursor-pointer select-none hover:bg-slate-100 transition"
+                >
+                  <div className="flex items-center justify-end gap-1.5">
+                    Điểm
+                    <SortIcon field="latestScore" currentSortBy={sortBy} currentSortOrder={sortOrder} />
+                  </div>
+                </th>
                 <th className="px-4 py-3 text-center">Rank</th>
                 <th className="px-4 py-3 text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
-              {suppliers.map((supplier) => (
-                <tr key={supplier.id}>
-                  <td className="px-4 py-3">
-                    <button onClick={() => edit(supplier)} className="text-left font-semibold text-ink hover:text-accent">
-                      {supplier.name}
-                    </button>
-                    <div className="text-xs text-slate-500">
-                      {supplier.code} - {supplier.email}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">{supplier.type}</td>
-                  <td className="px-4 py-3">{supplier.taxCode}</td>
-                  <td className="px-4 py-3 text-right font-semibold">{formatScore(supplier.latestScore)}</td>
-                  <td className="px-4 py-3 text-center">
-                    {supplier.latestRankCode ? (
-                      <span
-                        className="rounded px-2 py-1 text-xs font-semibold text-white"
-                        style={{ backgroundColor: supplier.latestRankColor ?? '#64748b' }}
+              {suppliers.map((supplier) => {
+                const isHighlighted = supplier.id === highlightId;
+                return (
+                  <tr
+                    key={supplier.id}
+                    className={`transition hover:bg-slate-50 ${
+                      isHighlighted ? 'bg-amber-50/80 font-medium border-l-4 border-l-amber-500' : ''
+                    }`}
+                  >
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => setDetailSupplierId(supplier.id)}
+                        className="text-left font-semibold text-ink hover:text-accent transition flex items-center gap-1.5 group"
                       >
-                        {supplier.latestRankCode}
-                      </span>
-                    ) : (
-                      <span className="text-xs text-slate-500">Chưa có</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <button
-                      onClick={() => remove(supplier)}
-                      className="focus-ring inline-flex rounded-md border border-red-200 p-2 text-red-600"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                        <span>{supplier.name}</span>
+                        <Eye size={14} className="text-slate-400 opacity-0 group-hover:opacity-100 transition" />
+                      </button>
+                      <div className="text-xs text-slate-500">
+                        {supplier.code} - {supplier.email || 'Không có email'}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">{supplier.type}</td>
+                    <td className="px-4 py-3">{supplier.taxCode}</td>
+                    <td className="px-4 py-3 text-right font-semibold">
+                      {formatScore(supplier.latestScore)}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {supplier.latestRankCode ? (
+                        <span
+                          className="rounded px-2.5 py-1 text-xs font-semibold text-white shadow-xs"
+                          style={{ backgroundColor: supplier.latestRankColor ?? '#64748b' }}
+                        >
+                          Rank {supplier.latestRankCode}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-slate-400 font-medium">Chưa có</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-right space-x-1.5">
+                      <button
+                        onClick={() => setDetailSupplierId(supplier.id)}
+                        title="Xem chi tiết đánh giá"
+                        className="focus-ring inline-flex rounded-md border border-line bg-white p-2 text-slate-600 hover:bg-slate-100 transition"
+                      >
+                        <Eye size={16} />
+                      </button>
+                      <button
+                        onClick={() => edit(supplier)}
+                        title="Chỉnh sửa thông tin"
+                        className="focus-ring inline-flex rounded-md border border-line bg-white p-2 text-blue-600 hover:bg-blue-50 transition"
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        onClick={() => remove(supplier)}
+                        title="Xóa nhà cung cấp"
+                        className="focus-ring inline-flex rounded-md border border-red-200 p-2 text-red-600 hover:bg-red-50 transition"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </section>
       )}
     </div>
+  );
+}
+
+function SortIcon({
+  field,
+  currentSortBy,
+  currentSortOrder,
+}: {
+  field: string;
+  currentSortBy: string;
+  currentSortOrder: 'ASC' | 'DESC';
+}) {
+  if (currentSortBy !== field) {
+    return <ArrowUpDown size={13} className="text-slate-400 opacity-60" />;
+  }
+  return currentSortOrder === 'ASC' ? (
+    <ArrowUp size={14} className="text-accent font-bold" />
+  ) : (
+    <ArrowDown size={14} className="text-accent font-bold" />
   );
 }
 
@@ -281,7 +593,7 @@ function Input({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         required={required}
-        className="focus-ring w-full rounded-md border border-line px-3 py-2"
+        className="focus-ring w-full rounded-md border border-line px-3 py-2 text-sm"
       />
     </label>
   );

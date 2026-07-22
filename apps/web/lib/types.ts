@@ -14,6 +14,7 @@ export type Supplier = {
   latestRankName?: string | null;
   latestRankColor?: string | null;
   lastEvaluatedAt?: string | null;
+  evaluations?: Evaluation[];
 };
 
 export type ScoreOption = {
@@ -70,6 +71,15 @@ export type EvaluationConfig = {
   rankRules: RankRule[];
 };
 
+export type EvaluationItem = {
+  id: string;
+  score: number;
+  note?: string;
+  normalizedScore: number;
+  criterion?: Criterion;
+  criterionId: string;
+};
+
 export type Evaluation = {
   id: string;
   period: string;
@@ -79,8 +89,9 @@ export type Evaluation = {
   rankName: string;
   rankColor: string;
   createdAt: string;
-  supplier: Supplier;
+  supplier?: Supplier;
   groupScores: Array<{ groupId: string; code: string; name: string; score: number; weight: number }>;
+  items?: EvaluationItem[];
 };
 
 export type Summary = {

@@ -24,8 +24,9 @@ export class EvaluationsService {
     private readonly scoring: ScoringService,
   ) {}
 
-  findAll() {
+  findAll(supplierId?: string) {
     return this.evaluations.find({
+      where: supplierId ? { supplierId } : {},
       relations: { supplier: true, items: { criterion: true } },
       order: { createdAt: 'DESC' },
     });

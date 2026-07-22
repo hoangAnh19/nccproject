@@ -9,6 +9,9 @@ type SupplierFilters = {
   search?: string;
   type?: string;
   rank?: string;
+  status?: string;
+  sortBy?: string;
+  sortOrder?: 'ASC' | 'DESC';
 };
 
 @Injectable()
@@ -19,26 +22,57 @@ export class SuppliersService {
   ) {}
 
   async findAll(filters: SupplierFilters) {
-    const where = [];
-    const base: Record<string, unknown> = {};
-    if (filters.type) base.type = filters.type;
-    if (filters.rank) base.latestRankCode = filters.rank;
-    if (filters.search) {
-      where.push({ ...base, name: Like(`%${filters.search}%`) });
-      where.push({ ...base, code: Like(`%${filters.search}%`) });
-      where.push({ ...base, taxCode: Like(`%${filters.search}%`) });
+    const qb = this.suppliers.createQueryBuilder('supplier');
+
+    if (filters.type) {
+      qb.andWhere('supplier.type = :type', { type: filters.type });
     }
 
-    return this.suppliers.find({
-      where: where.length > 0 ? where : base,
-      order: { createdAt: 'DESC' },
-    });
+    if (filters.rank) {
+      if (filters.rank === 'UNRATED' || filters.rank === 'Chưa có') {
+        qb.andWhere('supplier.latestRankCode IS NULL');
+      } else {
+        qb.andWhere('supplier.latestRankCode = :rank', { rank: filters.rank });
+      }
+    }
+
+    if (filters.status === 'evaluated') {
+      qb.andWhere('supplier.lastEvaluatedAt IS NOT NULL');
+    } else if (filters.status === 'unevaluated') {
+      qb.andWhere('supplier.lastEvaluatedAt IS NULL');
+    }
+
+    if (filters.search) {
+      qb.andWhere(
+        '(supplier.name LIKE :search OR supplier.code LIKE :search OR supplier.taxCode LIKE :search)',
+        { search: `%${filters.search}%` },
+      );
+    }
+
+    const sortFieldMap: Record<string, string> = {
+      name: 'supplier.name',
+      code: 'supplier.code',
+      taxCode: 'supplier.taxCode',
+      type: 'supplier.type',
+      latestScore: 'supplier.latestScore',
+      createdAt: 'supplier.createdAt',
+    };
+
+    const sortColumn = sortFieldMap[filters.sortBy ?? ''] || 'supplier.createdAt';
+    const sortDir = (filters.sortOrder?.toUpperCase() === 'ASC') ? 'ASC' : 'DESC';
+
+    qb.orderBy(sortColumn, sortDir);
+    if (sortColumn !== 'supplier.createdAt') {
+      qb.addOrderBy('supplier.createdAt', 'DESC');
+    }
+
+    return qb.getMany();
   }
 
   async findOne(id: string) {
     const supplier = await this.suppliers.findOne({
       where: { id },
-      relations: { evaluations: true },
+      relations: { evaluations: { items: { criterion: true } } },
       order: { evaluations: { createdAt: 'DESC' } },
     });
     if (!supplier) throw new NotFoundException('Không tìm thấy nhà cung cấp');

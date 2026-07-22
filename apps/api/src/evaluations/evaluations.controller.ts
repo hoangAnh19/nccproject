@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { CreateEvaluationDto } from './dto/create-evaluation.dto';
 import { EvaluationsService } from './evaluations.service';
 
@@ -7,8 +7,8 @@ export class EvaluationsController {
   constructor(private readonly evaluationsService: EvaluationsService) {}
 
   @Get()
-  findAll() {
-    return this.evaluationsService.findAll();
+  findAll(@Query('supplierId') supplierId?: string) {
+    return this.evaluationsService.findAll(supplierId);
   }
 
   @Get(':id')
