@@ -1,12 +1,16 @@
 {
   "name": "nccproject",
   "private": true,
+  "workspaces": [
+    "apps/api",
+    "apps/web"
+  ],
   "scripts": {
     "dev": "concurrently \"npm run dev:web\" \"npm run dev:api\"",
     "dev:web": "npm --prefix apps/web run dev",
     "dev:api": "npm --prefix apps/api run start:dev",
     "build": "npm --prefix apps/api run build && npm --prefix apps/web run build",
-    "lint": "npm --prefix apps/web run lint",
+    "lint": "npm --prefix apps/api run lint && npm --prefix apps/web run lint",
     "docker:up": "docker compose up --build",
     "docker:down": "docker compose down"
   },
