@@ -87,6 +87,8 @@ export type EvaluationItem = {
 
 export type Evaluation = {
   id: string;
+  supplierId?: string;
+  configId?: string;
   period: string;
   evaluator: string;
   totalScore: number;

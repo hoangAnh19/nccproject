@@ -11,6 +11,43 @@ type Scores = Record<string, { score: number; note: string }>;
 const includesText = (value: string | undefined | null, query: string) =>
   (value ?? '').toLowerCase().includes(query.toLowerCase().trim());
 
+function createDefaultScores(config: EvaluationConfig) {
+  const initial: Scores = {};
+  config.groups.forEach((group) => {
+    group.criteria.forEach((criterion) => {
+      initial[criterion.id] = { score: config.scaleMax, note: '' };
+    });
+  });
+  return initial;
+}
+
+function getEvaluationSupplierId(evaluation: Evaluation) {
+  return evaluation.supplierId ?? evaluation.supplier?.id;
+}
+
+function findEvaluation(evaluations: Evaluation[], supplierId: string, period: string) {
+  return evaluations.find((evaluation) => getEvaluationSupplierId(evaluation) === supplierId && evaluation.period === period);
+}
+
+function getLatestSupplierEvaluation(evaluations: Evaluation[], supplierId: string) {
+  return evaluations.find((evaluation) => getEvaluationSupplierId(evaluation) === supplierId);
+}
+
+function hydrateScoresFromEvaluation(config: EvaluationConfig, evaluation: Evaluation) {
+  const nextScores = createDefaultScores(config);
+  const nextTouched: Record<string, boolean> = {};
+
+  evaluation.items?.forEach((item) => {
+    nextScores[item.criterionId] = {
+      score: item.score,
+      note: item.note ?? '',
+    };
+    nextTouched[item.criterionId] = true;
+  });
+
+  return { scores: nextScores, touchedCriteria: nextTouched };
+}
+
 function groupCriteriaByLayer(criteria: EvaluationConfig['groups'][number]['criteria']) {
   const layers = new Map<
     string,
@@ -64,13 +101,7 @@ export default function EvaluationsPage() {
         setEvaluations(evaluationData);
         setPeriod(configData.evaluationPeriod);
         setSupplierId(supplierData.items?.[0]?.id ?? '');
-        const initial: Scores = {};
-        configData.groups.forEach((group) => {
-          group.criteria.forEach((criterion) => {
-            initial[criterion.id] = { score: configData.scaleMax, note: '' };
-          });
-        });
-        setScores(initial);
+        setScores(createDefaultScores(configData));
       })
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
@@ -96,10 +127,59 @@ export default function EvaluationsPage() {
     }
   }, [filteredSuppliers, supplierId]);
 
+  useEffect(() => {
+    if (!config || !supplierId) return;
+    const latestEvaluation = getLatestSupplierEvaluation(evaluations, supplierId);
+    setPeriod(latestEvaluation?.period ?? config.evaluationPeriod);
+  }, [config, evaluations, supplierId]);
+
   const periodOptions = useMemo(() => {
     const values = [config?.evaluationPeriod, ...evaluations.map((evaluation) => evaluation.period)].filter(Boolean);
     return [...new Set(values as string[])].sort().reverse();
   }, [config?.evaluationPeriod, evaluations]);
+
+  useEffect(() => {
+    if (!config) return;
+
+    const resetScores = () => {
+      setScores(createDefaultScores(config));
+      setTouchedCriteria({});
+    };
+
+    if (!supplierId || !period) {
+      resetScores();
+      return;
+    }
+
+    const existingEvaluation = findEvaluation(evaluations, supplierId, period);
+    if (!existingEvaluation) {
+      resetScores();
+      return;
+    }
+
+    let cancelled = false;
+    const applyEvaluation = (evaluation: Evaluation) => {
+      if (cancelled) return;
+      const hydrated = hydrateScoresFromEvaluation(config, evaluation);
+      setScores(hydrated.scores);
+      setTouchedCriteria(hydrated.touchedCriteria);
+      setEvaluator(evaluation.evaluator);
+    };
+
+    if (existingEvaluation.items?.length) {
+      applyEvaluation(existingEvaluation);
+    } else {
+      apiFetch<Evaluation>(`/evaluations/${existingEvaluation.id}`)
+        .then(applyEvaluation)
+        .catch((err: Error) => {
+          if (!cancelled) setError(err.message);
+        });
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [config, evaluations, period, supplierId]);
 
   const filteredEvaluations = useMemo(() => {
     return evaluations.filter((evaluation) => {
