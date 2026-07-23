@@ -49,7 +49,7 @@ export default function SuppliersPage() {
   const [pagination, setPagination] = useState<Omit<PaginatedResponse, 'items'>>({
     total: 0,
     page: 1,
-    limit: 20,
+    limit: 10,
     totalPages: 1,
   });
 
@@ -60,7 +60,7 @@ export default function SuppliersPage() {
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(20);
+  const [limit, setLimit] = useState(10);
   const [highlightId, setHighlightId] = useState<string | null>(null);
   const [detailSupplierId, setDetailSupplierId] = useState<string | null>(null);
 

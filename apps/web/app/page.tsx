@@ -1,11 +1,39 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Award, BarChart3, CheckCircle2, LineChart, Percent, Users } from 'lucide-react';
+import iconGuideline from '@/assets/images/icon-1.png';
+import iconEvaluation from '@/assets/images/icon-2.png';
+import iconReport from '@/assets/images/icon-3.png';
 import { apiFetch, formatScore } from '@/lib/api';
 import type { Supplier, Summary } from '@/lib/types';
 import { EmptyState, ErrorState, LoadingState } from '@/components/state';
+
+const actionCards = [
+  {
+    title: 'Hướng dẫn',
+    description: 'Tài liệu hướng dẫn sử dụng bộ tiêu chí, thang điểm 1-5 và quy trình phân loại nhà cung cấp.',
+    cta: 'Đọc hướng dẫn',
+    href: '/guideline',
+    icon: iconGuideline,
+  },
+  {
+    title: 'Thực hiện đánh giá',
+    description: 'Chọn nhà thầu và tiến hành chấm điểm theo 4 nhóm tiêu chí A, B, C, D với minh chứng đính kèm.',
+    cta: 'Bắt đầu đánh giá',
+    href: '/evaluations',
+    icon: iconEvaluation,
+  },
+  {
+    title: 'Báo cáo',
+    description: 'Xem tổng hợp kết quả, so sánh các kỳ đánh giá và xuất báo cáo Excel phục vụ phê duyệt.',
+    cta: 'Xem báo cáo',
+    href: '/reports',
+    icon: iconReport,
+  },
+];
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<Summary | null>(null);
@@ -46,6 +74,8 @@ export default function DashboardPage() {
           Tổng quan chất lượng nhà cung cấp CNTT từ dữ liệu đang lưu trong hệ thống.
         </p>
       </header>
+
+ 
 
       <section className="grid gap-4 md:grid-cols-4">
         {cards.map((card) => {
@@ -106,24 +136,39 @@ export default function DashboardPage() {
         <div className="rounded-md border border-line bg-white p-5">
           <div className="mb-4 flex items-center gap-2 font-semibold text-ink">
             <LineChart size={18} />
-            Xu hướng điểm theo kỳ
+            So sánh điểm Tb qua các kỳ đánh giá
           </div>
           {summary.scoreTrend.length === 0 ? (
             <EmptyState message="Chưa có dữ liệu xu hướng" />
           ) : (
-            <div className="space-y-3">
-              {summary.scoreTrend.map((item) => (
-                <div key={item.period} className="grid grid-cols-[90px_1fr_64px] items-center gap-3 text-sm">
-                  <span className="font-medium">{item.period}</span>
-                  <div className="h-3 rounded-full bg-slate-100">
-                    <div className="h-3 rounded-full bg-accent" style={{ width: `${item.averageScore}%` }} />
-                  </div>
-                  <span className="text-right font-semibold">{formatScore(item.averageScore)}</span>
-                </div>
-              ))}
-            </div>
+            <ScoreTrendLineChart data={summary.scoreTrend} />
           )}
         </div>
+      </section>
+
+
+
+     <section className="grid gap-4 md:grid-cols-3 xl:gap-6">
+        {actionCards.map((card) => (
+          <Link
+            key={card.href}
+            href={card.href}
+            className="group rounded-md border border-line bg-white p-5 transition hover:border-accent hover:shadow-sm sm:p-6"
+          >
+            <Image src={card.icon} alt="" className="mb-4 h-12 w-12" />
+            <h2 className="text-lg font-bold text-ink transition group-hover:text-accent sm:text-xl">{card.title}</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-500">{card.description}</p>
+            <div className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-ink transition group-hover:text-accent">
+              {card.cta}
+              <svg width="22" height="22" viewBox="0 0 27 26" fill="none" aria-hidden="true" className="transition group-hover:translate-x-1">
+                <path
+                  d="M20.286 11.297L11.346 2.35702L13.703 0L26.6667 12.9637L13.703 25.9272L11.346 23.5702L20.286 14.6304H0V11.297H20.286Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </div>
+          </Link>
+        ))}
       </section>
 
       <section className="rounded-md border border-line bg-white">
@@ -165,6 +210,72 @@ export default function DashboardPage() {
           </div>
         )}
       </section>
+    </div>
+  );
+}
+
+function ScoreTrendLineChart({ data }: { data: Summary['scoreTrend'] }) {
+  const width = 760;
+  const height = 300;
+  const padding = { top: 28, right: 34, bottom: 58, left: 52 };
+  const chartWidth = width - padding.left - padding.right;
+  const chartHeight = height - padding.top - padding.bottom;
+  const yMin = Math.min(60, Math.floor(Math.min(...data.map((item) => item.averageScore)) / 10) * 10);
+  const yMax = Math.max(100, Math.ceil(Math.max(...data.map((item) => item.averageScore)) / 10) * 10);
+  const yTicks = Array.from({ length: Math.floor((yMax - yMin) / 10) + 1 }, (_, index) => yMax - index * 10);
+
+  const points = data.map((item, index) => {
+    const x = padding.left + (data.length === 1 ? chartWidth / 2 : (index / (data.length - 1)) * chartWidth);
+    const y = padding.top + ((yMax - item.averageScore) / (yMax - yMin || 1)) * chartHeight;
+    return { ...item, x, y };
+  });
+  const linePath = points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`).join(' ');
+
+  return (
+    <div className="overflow-x-auto">
+      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Biểu đồ So sánh điểm Tb qua các kỳ đánh giá" className="min-w-[560px]">
+        {yTicks.map((tick) => {
+          const y = padding.top + ((yMax - tick) / (yMax - yMin || 1)) * chartHeight;
+          return (
+            <g key={tick}>
+              <line x1={padding.left} y1={y} x2={width - padding.right} y2={y} stroke="#e2e8f0" strokeWidth="1" />
+              <text x={padding.left - 18} y={y + 5} textAnchor="end" className="fill-slate-500 text-[13px]">
+                {tick}
+              </text>
+            </g>
+          );
+        })}
+
+        <line
+          x1={padding.left}
+          y1={height - padding.bottom}
+          x2={width - padding.right}
+          y2={height - padding.bottom}
+          stroke="#334155"
+          strokeWidth="1.5"
+        />
+        <path d={linePath} fill="none" stroke="#0f766e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+
+        {points.map((point) => (
+          <g key={point.period}>
+            <circle cx={point.x} cy={point.y} r="7" fill="#0f766e" />
+            <text x={point.x} y={point.y - 12} textAnchor="middle" className="fill-ink text-[13px] font-semibold">
+              {formatScore(point.averageScore)}
+            </text>
+            <text x={point.x} y={height - padding.bottom + 30} textAnchor="middle" className="fill-ink text-[13px]">
+              {point.period}
+            </text>
+          </g>
+        ))}
+
+        <g transform={`translate(${width / 2 - 42} ${height - 10})`}>
+          <line x1="0" y1="0" x2="20" y2="0" stroke="#0f766e" strokeWidth="3" strokeLinecap="round" />
+          <circle cx="10" cy="0" r="6" fill="#0f766e" />
+          <text x="28" y="5" className="fill-ink text-[13px]">
+            Điểm TB
+          </text>
+        </g>
+      </svg>
     </div>
   );
 }
