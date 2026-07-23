@@ -15,8 +15,14 @@ export class SuppliersController {
     @Query('status') status?: string,
     @Query('sortBy') sortBy?: string,
     @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
   ) {
-    return this.suppliersService.findAll({ search, type, rank, status, sortBy, sortOrder });
+    return this.suppliersService.findAll({
+      search, type, rank, status, sortBy, sortOrder,
+      page: page ? parseInt(page, 10) : undefined,
+      limit: limit ? parseInt(limit, 10) : undefined,
+    });
   }
 
   @Get(':id')

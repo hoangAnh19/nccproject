@@ -12,6 +12,8 @@ type SupplierFilters = {
   status?: string;
   sortBy?: string;
   sortOrder?: 'ASC' | 'DESC';
+  page?: number;
+  limit?: number;
 };
 
 @Injectable()
@@ -66,7 +68,12 @@ export class SuppliersService {
       qb.addOrderBy('supplier.createdAt', 'DESC');
     }
 
-    return qb.getMany();
+    const page = Math.max(1, filters.page ?? 1);
+    const limit = Math.min(100, Math.max(1, filters.limit ?? 20));
+    qb.skip((page - 1) * limit).take(limit);
+
+    const [items, total] = await qb.getManyAndCount();
+    return { items, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
   async findOne(id: string) {

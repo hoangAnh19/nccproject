@@ -53,16 +53,16 @@ export default function EvaluationsPage() {
 
   useEffect(() => {
     Promise.all([
-      apiFetch<Supplier[]>('/suppliers'),
+      apiFetch<{ items: Supplier[] }>('/suppliers?limit=500'),
       apiFetch<EvaluationConfig>('/evaluation-configs/default/form-schema'),
       apiFetch<Evaluation[]>('/evaluations'),
     ])
       .then(([supplierData, configData, evaluationData]) => {
-        setSuppliers(supplierData);
+        setSuppliers(supplierData.items ?? []);
         setConfig(configData);
         setEvaluations(evaluationData);
         setPeriod(configData.evaluationPeriod);
-        setSupplierId(supplierData[0]?.id ?? '');
+        setSupplierId(supplierData.items?.[0]?.id ?? '');
         const initial: Scores = {};
         configData.groups.forEach((group) => {
           group.criteria.forEach((criterion) => {

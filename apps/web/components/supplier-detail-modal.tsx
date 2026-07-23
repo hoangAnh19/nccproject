@@ -269,17 +269,39 @@ function EvaluationDetailView({ evaluation, isCurrent }: { evaluation: Evaluatio
     setCollapsedSections((prev) => ({ ...prev, [code]: !prev[code] }));
   };
 
-  // Group items by criterion group / layer code
-  const itemsByGroup = new Map<string, { groupName: string; items: typeof evaluation.items }>();
+  // Build two-level grouping: top-level (A, B, C, D) → sub-group (A1, A2...) → items
+  type SubGroup = { code: string; name: string; items: NonNullable<typeof evaluation.items> };
+  type TopGroup = { letter: string; subGroups: Map<string, SubGroup> };
+  const topGroups = new Map<string, TopGroup>();
+
   if (evaluation.items) {
     evaluation.items.forEach((item) => {
-      const groupCode = item.criterion?.layer1Code ?? item.criterion?.code?.split('.')[0] ?? 'Khác';
-      const groupName = item.criterion?.layer1Name ?? `Nhóm ${groupCode}`;
-      const current = itemsByGroup.get(groupCode) ?? { groupName, items: [] };
-      current.items!.push(item);
-      itemsByGroup.set(groupCode, current);
+      const rawCode = item.criterion?.layer1Code ?? item.criterion?.code?.split('.')[0] ?? 'Z';
+      // Top-level letter is the leading alphabet character(s) before any digit
+      const topLetter = rawCode.match(/^[A-Za-z]+/)?.[0]?.toUpperCase() ?? 'Z';
+      const subCode = rawCode.toUpperCase();
+      const subName = item.criterion?.layer1Name ?? `Nhóm ${subCode}`;
+
+      if (!topGroups.has(topLetter)) {
+        topGroups.set(topLetter, { letter: topLetter, subGroups: new Map() });
+      }
+      const topGroup = topGroups.get(topLetter)!;
+      if (!topGroup.subGroups.has(subCode)) {
+        topGroup.subGroups.set(subCode, { code: subCode, name: subName, items: [] });
+      }
+      topGroup.subGroups.get(subCode)!.items.push(item);
     });
   }
+
+  // Sort top-level A→B→C→D and sub-groups A1→A2→... inside each
+  const sortedTopGroups = [...topGroups.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([letter, tg]) => ({
+      letter,
+      subGroups: [...tg.subGroups.entries()]
+        .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
+        .map(([, sg]) => sg),
+    }));
 
   return (
     <div className="space-y-5">
@@ -352,6 +374,7 @@ function EvaluationDetailView({ evaluation, isCurrent }: { evaluation: Evaluatio
       {/* Criteria Score Items Detail Table (Collapsible by Group) */}
       {evaluation.items && evaluation.items.length > 0 && (
         <div className="rounded-md border border-line bg-white overflow-hidden">
+          {/* Outer header: expand/collapse the whole criteria table */}
           <div
             onClick={() => setShowCriteriaTable(!showCriteriaTable)}
             className="flex cursor-pointer items-center justify-between bg-slate-50 px-4 py-3 border-b border-line hover:bg-slate-100 transition select-none"
@@ -360,66 +383,87 @@ function EvaluationDetailView({ evaluation, isCurrent }: { evaluation: Evaluatio
               {showCriteriaTable ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
               Bảng điểm tiêu chí chi tiết ({evaluation.items.length} mục)
             </div>
-            <span className="text-xs font-medium text-slate-500">
-              {showCriteriaTable ? 'Thu gọn tất cả' : 'Mở rộng tất cả'}
-            </span>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setCollapsedSections({}); }}
+                className="flex items-center gap-1 text-xs font-medium text-accent hover:underline"
+              >
+                <ChevronsDown size={13} /> Mở rộng tất cả
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const next: Record<string, boolean> = {};
+                  sortedTopGroups.forEach((tg) => tg.subGroups.forEach((sg) => { next[sg.code] = true; }));
+                  setCollapsedSections(next);
+                }}
+                className="flex items-center gap-1 text-xs font-medium text-slate-600 hover:underline"
+              >
+                <ChevronsUp size={13} /> Thu gọn tất cả
+              </button>
+            </div>
           </div>
 
           {showCriteriaTable && (
             <div className="divide-y divide-line">
-              {[...itemsByGroup.entries()].map(([gCode, gData]) => {
-                const isCollapsed = Boolean(collapsedSections[gCode]);
-                return (
-                  <div key={gCode}>
-                    {/* Sub-header for group section inside criteria table */}
-                    <div
-                      onClick={() => toggleSection(gCode)}
-                      className="flex cursor-pointer items-center justify-between bg-slate-100/70 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200/70 transition select-none"
-                    >
-                      <div className="flex items-center gap-2">
-                        {isCollapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
-                        <span>
-                          {gCode}. {gData.groupName}
-                        </span>
-                      </div>
-                      <span className="font-medium text-slate-500">
-                        {gData.items?.length ?? 0} tiêu chí
-                      </span>
-                    </div>
-
-                    {!isCollapsed && (
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-left text-xs">
-                          <thead className="bg-slate-50/50 uppercase text-slate-400 border-b border-line">
-                            <tr>
-                              <th className="px-4 py-2">Tiêu chí</th>
-                              <th className="px-4 py-2 text-center">Điểm gốc</th>
-                              <th className="px-4 py-2 text-right">Điểm quy đổi</th>
-                              <th className="px-4 py-2">Ghi chú</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-line">
-                            {gData.items?.map((item) => (
-                              <tr key={item.id} className="hover:bg-slate-50/80">
-                                <td className="px-4 py-2 font-medium text-slate-800">
-                                  {item.criterion ? `${item.criterion.code}. ${item.criterion.name}` : 'Tiêu chí'}
-                                </td>
-                                <td className="px-4 py-2 text-center font-semibold text-ink">{item.score}</td>
-                                <td className="px-4 py-2 text-right font-bold text-accent">
-                                  {formatScore(item.normalizedScore)}
-                                </td>
-                                <td className="px-4 py-2 text-slate-500 italic">
-                                  {item.note || '-'}
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    )}
+              {sortedTopGroups.map((topGroup) => (
+                <div key={topGroup.letter}>
+                  {/* Top-level group header (A / B / C / D) */}
+                  <div className="bg-slate-200/60 px-4 py-2 text-xs font-extrabold tracking-widest uppercase text-slate-600">
+                    Nhóm {topGroup.letter}
                   </div>
-                );
-              })}
+
+                  {topGroup.subGroups.map((sg) => {
+                    const isCollapsed = Boolean(collapsedSections[sg.code]);
+                    return (
+                      <div key={sg.code}>
+                        {/* Sub-group header (A1, A2, B3...) */}
+                        <div
+                          onClick={() => toggleSection(sg.code)}
+                          className="flex cursor-pointer items-center justify-between bg-slate-100/70 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200/70 transition select-none pl-6"
+                        >
+                          <div className="flex items-center gap-2">
+                            {isCollapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
+                            <span>{sg.code}. {sg.name}</span>
+                          </div>
+                          <span className="font-medium text-slate-500">{sg.items.length} tiêu chí</span>
+                        </div>
+
+                        {!isCollapsed && (
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-left text-xs">
+                              <thead className="bg-slate-50/50 uppercase text-slate-400 border-b border-line">
+                                <tr>
+                                  <th className="px-4 py-2">Tiêu chí</th>
+                                  <th className="px-4 py-2 text-center">Điểm gốc</th>
+                                  <th className="px-4 py-2 text-right">Điểm quy đổi</th>
+                                  <th className="px-4 py-2">Ghi chú</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-line">
+                                {sg.items.map((item) => (
+                                  <tr key={item.id} className="hover:bg-slate-50/80">
+                                    <td className="px-4 py-2 font-medium text-slate-800">
+                                      {item.criterion ? `${item.criterion.code}. ${item.criterion.name}` : 'Tiêu chí'}
+                                    </td>
+                                    <td className="px-4 py-2 text-center font-semibold text-ink">{item.score}</td>
+                                    <td className="px-4 py-2 text-right font-bold text-accent">
+                                      {formatScore(item.normalizedScore)}
+                                    </td>
+                                    <td className="px-4 py-2 text-slate-500 italic">{item.note || '-'}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
             </div>
           )}
         </div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
-import { CopyPlus, Eye, Plus, Save, Star, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronRight, ChevronsDown, ChevronsUp, CopyPlus, Eye, Plus, Save, Star, Trash2 } from 'lucide-react';
 import { apiFetch, formatScore } from '@/lib/api';
 import type { EvaluationConfig } from '@/lib/types';
 import { EmptyState, ErrorState, LoadingState } from '@/components/state';
@@ -18,6 +18,7 @@ export default function AdminPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const [previewScore, setPreviewScore] = useState<{
     totalScore: number;
     rank: { code: string; name: string; color: string };
@@ -45,14 +46,19 @@ export default function AdminPage() {
   const totals = useMemo(() => {
     if (!draft) return { groupTotal: 0, criterionTotals: [] as Array<{ code: string; total: number }> };
     return {
-      groupTotal: draft.groups
-        .filter((group) => group.isActive)
-        .reduce((sum, group) => sum + Number(group.weight), 0),
+      groupTotal: Math.round(
+        draft.groups
+          .filter((group) => group.isActive)
+          .reduce((sum, group) => sum + Number(group.weight), 0) * 10000,
+      ) / 10000,
       criterionTotals: draft.groups.map((group) => ({
         code: group.code,
-        total: group.criteria
-          .filter((criterion) => criterion.isActive)
-          .reduce((sum, criterion) => sum + Number(criterion.weight), 0),
+        total:
+          Math.round(
+            group.criteria
+              .filter((criterion) => criterion.isActive)
+              .reduce((sum, criterion) => sum + Number(criterion.weight), 0) * 10000,
+          ) / 10000,
       })),
     };
   }, [draft]);
@@ -62,6 +68,20 @@ export default function AdminPage() {
     setSelectedId(id);
     setDraft(config ? JSON.parse(JSON.stringify(config)) : null);
     setPreviewScore(null);
+    setCollapsedGroups({});
+  };
+
+  const toggleGroup = (key: string) => {
+    setCollapsedGroups((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const expandAll = () => setCollapsedGroups({});
+
+  const collapseAll = () => {
+    if (!draft) return;
+    const next: Record<string, boolean> = {};
+    draft.groups.forEach((g, i) => { next[g.id ?? `${g.code}-${i}`] = true; });
+    setCollapsedGroups(next);
   };
 
   const save = async () => {
@@ -233,70 +253,112 @@ export default function AdminPage() {
       )}
 
       <section className="space-y-4">
+        {/* Expand/Collapse All */}
+        <div className="flex items-center justify-between px-1 text-xs text-slate-500">
+          <span className="font-semibold text-slate-700">Các nhóm tiêu chí ({draft.groups.length} nhóm)</span>
+          <div className="flex items-center gap-3">
+            <button type="button" onClick={expandAll} className="flex items-center gap-1 font-medium text-accent hover:underline">
+              <ChevronsDown size={14} /> Mở rộng tất cả
+            </button>
+            <button type="button" onClick={collapseAll} className="flex items-center gap-1 font-medium text-slate-600 hover:underline">
+              <ChevronsUp size={14} /> Thu gọn tất cả
+            </button>
+          </div>
+        </div>
+
         {draft.groups.map((group, groupIndex) => {
+          const groupKey = group.id ?? `${group.code}-${groupIndex}`;
+          const isCollapsed = Boolean(collapsedGroups[groupKey]);
           const criterionTotal = totals.criterionTotals[groupIndex]?.total ?? 0;
           return (
-            <div key={group.id ?? `${group.code}-${groupIndex}`} className="rounded-md border border-line bg-white">
-              <div className="grid gap-3 border-b border-line p-4 md:grid-cols-[90px_1fr_120px_120px_130px]">
-                <Input label="Mã nhóm" value={group.code} onChange={(value) => updateGroup(groupIndex, { code: value })} />
-                <Input label="Tên nhóm" value={group.name} onChange={(value) => updateGroup(groupIndex, { name: value })} />
-                <NumberInput
-                  label="Trọng số"
-                  value={group.weight}
-                  onChange={(value) => updateGroup(groupIndex, { weight: value })}
-                />
-                <div className="text-sm">
-                  <div className="mb-1 text-xs font-medium text-slate-600">Tổng tiêu chí</div>
-                  <div className={criterionTotal === 100 ? 'text-emerald-700' : 'text-red-600'}>
-                    {criterionTotal}%
-                  </div>
+            <div key={groupKey} className="rounded-md border border-line bg-white overflow-hidden">
+              {/* Group Header - Clickable to collapse */}
+              <div
+                onClick={() => toggleGroup(groupKey)}
+                className="flex cursor-pointer items-center justify-between border-b border-line bg-slate-50/80 px-4 py-3 hover:bg-slate-100/80 transition select-none"
+              >
+                <div className="flex items-center gap-2">
+                  {isCollapsed ? (
+                    <ChevronRight size={18} className="text-slate-500 flex-shrink-0" />
+                  ) : (
+                    <ChevronDown size={18} className="text-slate-500 flex-shrink-0" />
+                  )}
+                  <span className="font-semibold text-ink">{group.code}. {group.name}</span>
+                  <span className="rounded bg-slate-200 px-2 py-0.5 text-xs text-slate-600 font-medium">
+                    {group.criteria.length} tiêu chí
+                  </span>
+                  <span className={`text-xs font-medium ${criterionTotal === 100 ? 'text-emerald-700' : 'text-red-500'}`}>
+                    ({criterionTotal}%)
+                  </span>
                 </div>
-                <div className="self-end">
-                  <Action onClick={() => addCriterion(groupIndex)} icon={Plus} label="Thêm tiêu chí" />
-                </div>
+                <span className="text-sm text-slate-600">Trọng số nhóm <b>{group.weight}%</b></span>
               </div>
-              <div className="divide-y divide-line">
-                {group.criteria.map((criterion, criterionIndex) => (
-                  <div
-                    key={criterion.id ?? `${group.code}-${criterionIndex}`}
-                    className="grid gap-3 p-4 md:grid-cols-[90px_1fr_120px_90px_44px]"
-                  >
-                    <Input
-                      label="Mã"
-                      value={criterion.code}
-                      onChange={(value) => updateCriterion(groupIndex, criterionIndex, { code: value })}
-                    />
-                    <Input
-                      label="Tiêu chí con"
-                      value={criterion.name}
-                      onChange={(value) => updateCriterion(groupIndex, criterionIndex, { name: value })}
-                    />
+
+              {/* Inline group fields */}
+              {!isCollapsed && (
+                <div>
+                  <div className="grid gap-3 border-b border-line p-4 md:grid-cols-[90px_1fr_120px_120px_130px]" onClick={(e) => e.stopPropagation()}>
+                    <Input label="Mã nhóm" value={group.code} onChange={(value) => updateGroup(groupIndex, { code: value })} />
+                    <Input label="Tên nhóm" value={group.name} onChange={(value) => updateGroup(groupIndex, { name: value })} />
                     <NumberInput
                       label="Trọng số"
-                      value={criterion.weight}
-                      onChange={(value) => updateCriterion(groupIndex, criterionIndex, { weight: value })}
+                      value={group.weight}
+                      onChange={(value) => updateGroup(groupIndex, { weight: value })}
                     />
-                    <label className="flex items-center gap-2 self-end pb-2 text-sm">
-                      <input
-                        type="checkbox"
-                        checked={criterion.isActive !== false}
-                        onChange={(event) =>
-                          updateCriterion(groupIndex, criterionIndex, { isActive: event.target.checked })
-                        }
-                      />
-                      Bật
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => removeCriterion(groupIndex, criterionIndex)}
-                      className="focus-ring self-end rounded-md border border-red-200 p-2 text-red-600"
-                      title="Xóa tiêu chí"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    <div className="text-sm">
+                      <div className="mb-1 text-xs font-medium text-slate-600">Tổng tiêu chí</div>
+                      <div className={criterionTotal === 100 ? 'text-emerald-700' : 'text-red-600'}>
+                        {criterionTotal}%
+                      </div>
+                    </div>
+                    <div className="self-end">
+                      <Action onClick={() => addCriterion(groupIndex)} icon={Plus} label="Thêm tiêu chí" />
+                    </div>
                   </div>
-                ))}
-              </div>
+                  <div className="divide-y divide-line">
+                    {group.criteria.map((criterion, criterionIndex) => (
+                      <div
+                        key={criterion.id ?? `${group.code}-${criterionIndex}`}
+                        className="grid gap-3 p-4 md:grid-cols-[90px_1fr_120px_90px_44px]"
+                      >
+                        <Input
+                          label="Mã"
+                          value={criterion.code}
+                          onChange={(value) => updateCriterion(groupIndex, criterionIndex, { code: value })}
+                        />
+                        <Input
+                          label="Tiêu chí con"
+                          value={criterion.name}
+                          onChange={(value) => updateCriterion(groupIndex, criterionIndex, { name: value })}
+                        />
+                        <NumberInput
+                          label="Trọng số"
+                          value={criterion.weight}
+                          onChange={(value) => updateCriterion(groupIndex, criterionIndex, { weight: value })}
+                        />
+                        <label className="flex items-center gap-2 self-end pb-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={criterion.isActive !== false}
+                            onChange={(event) =>
+                              updateCriterion(groupIndex, criterionIndex, { isActive: event.target.checked })
+                            }
+                          />
+                          Bật
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => removeCriterion(groupIndex, criterionIndex)}
+                          className="focus-ring self-end rounded-md border border-red-200 p-2 text-red-600"
+                          title="Xóa tiêu chí"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}

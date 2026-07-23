@@ -27,7 +27,8 @@ export class EvaluationsService {
   findAll(supplierId?: string) {
     return this.evaluations.find({
       where: supplierId ? { supplierId } : {},
-      relations: { supplier: true, items: { criterion: true } },
+      // Only load supplier name for list view; avoid loading all items/criteria (very slow)
+      relations: { supplier: true },
       order: { createdAt: 'DESC' },
     });
   }
