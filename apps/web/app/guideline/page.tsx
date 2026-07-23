@@ -6,10 +6,10 @@ const sections = [
       'Thực hiện xếp hạng NCC theo từng lĩnh vực chính, cung cấp thông tin bổ trợ trong quá trình lựa chọn NCC.',
     ],
   },
-  {
-    title: 'Lộ trình triển khai',
-    content: ['Cập nhật theo kế hoạch triển khai chính thức của đơn vị quản lý hệ thống.'],
-  },
+  // {
+  //   title: 'Lộ trình triển khai',
+  //   content: ['Cập nhật theo kế hoạch'],
+  // },
   {
     title: 'Cấu trúc',
     content: [
