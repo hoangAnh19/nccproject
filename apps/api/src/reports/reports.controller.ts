@@ -10,6 +10,11 @@ export class ReportsController {
     return this.reportsService.summary();
   }
 
+  @Get('annual')
+  annual(@Query('field') field?: string, @Query('period') period?: string) {
+    return this.reportsService.annual(field, period);
+  }
+
   @Get('rank-distribution')
   rankDistribution() {
     return this.reportsService.rankDistribution();

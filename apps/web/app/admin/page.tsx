@@ -6,6 +6,11 @@ import { ChevronDown, ChevronRight, ChevronsDown, ChevronsUp, CopyPlus, Eye, Plu
 import { apiFetch, formatScore } from '@/lib/api';
 import type { EvaluationConfig } from '@/lib/types';
 import { EmptyState, ErrorState, LoadingState } from '@/components/state';
+import { FinalConfigSettings } from '@/components/final-config-settings';
+
+// Entity relation IDs and timestamps are transport metadata, not editable configuration.
+const configBody = (config: unknown) => JSON.stringify(config, (key, value) =>
+  ['id', 'configId', 'groupId', 'createdAt', 'updatedAt'].includes(key) ? undefined : value);
 
 type DraftGroup = EvaluationConfig['groups'][number];
 type DraftCriterion = DraftGroup['criteria'][number];
@@ -92,7 +97,7 @@ export default function AdminPage() {
     try {
       const saved = await apiFetch<EvaluationConfig>(`/admin/evaluation-configs/${draft.id}`, {
         method: 'PATCH',
-        body: JSON.stringify(draft),
+        body: configBody(draft),
       });
       setMessage('Đã lưu cấu hình');
       setDraft(saved);
@@ -109,6 +114,8 @@ export default function AdminPage() {
     const clone = {
       ...draft,
       name: `${draft.name} - bản sao`,
+      version: `${draft.version ?? 'custom'}-${Date.now()}`,
+      weightsConfirmed: false,
       isDefault: false,
       groups: draft.groups.map((group) => ({
         ...group,
@@ -120,7 +127,7 @@ export default function AdminPage() {
     };
     const saved = await apiFetch<EvaluationConfig>('/admin/evaluation-configs', {
       method: 'POST',
-      body: JSON.stringify(clone),
+      body: configBody(clone),
     });
     setConfigs([saved, ...configs]);
     setSelectedId(saved.id);
@@ -218,6 +225,7 @@ export default function AdminPage() {
           <input
             type="checkbox"
             checked={draft.useCriterionWeights}
+            disabled={draft.scoringMethod === 'layered'}
             onChange={(event) => setDraft({ ...draft, useCriterionWeights: event.target.checked })}
           />
           Dùng trọng số tiêu chí con
@@ -234,7 +242,7 @@ export default function AdminPage() {
         </div>
         <div className="flex flex-wrap gap-2 lg:col-span-4">
           <Action onClick={cloneConfig} icon={CopyPlus} label="Tạo bản sao" />
-          <Action onClick={addGroup} icon={Plus} label="Thêm nhóm" />
+          <Action onClick={addGroup} disabled={draft.scoringMethod === 'layered'} icon={Plus} label="Thêm nhóm" />
           <Action onClick={setDefault} icon={Star} label="Đặt mặc định" />
           <Action onClick={remove} icon={Trash2} label="Xóa" danger />
         </div>
@@ -251,6 +259,8 @@ export default function AdminPage() {
           </span>
         </section>
       )}
+
+      {draft.scoringMethod === 'layered' && <FinalConfigSettings config={draft} onChange={setDraft} />}
 
       <section className="space-y-4">
         {/* Expand/Collapse All */}
@@ -312,7 +322,7 @@ export default function AdminPage() {
                       </div>
                     </div>
                     <div className="self-end">
-                      <Action onClick={() => addCriterion(groupIndex)} icon={Plus} label="Thêm tiêu chí" />
+                      <Action onClick={() => addCriterion(groupIndex)} disabled={draft.scoringMethod === 'layered'} icon={Plus} label="Thêm tiêu chí" />
                     </div>
                   </div>
                   <div className="divide-y divide-line">
@@ -331,11 +341,11 @@ export default function AdminPage() {
                           value={criterion.name}
                           onChange={(value) => updateCriterion(groupIndex, criterionIndex, { name: value })}
                         />
-                        <NumberInput
+                        {draft.scoringMethod === 'layered' ? <p className="self-center text-xs text-slate-500">Bình quân trong {criterion.layer1Code}</p> : <NumberInput
                           label="Trọng số"
                           value={criterion.weight}
                           onChange={(value) => updateCriterion(groupIndex, criterionIndex, { weight: value })}
-                        />
+                        />}
                         <label className="flex items-center gap-2 self-end pb-2 text-sm">
                           <input
                             type="checkbox"
@@ -413,7 +423,7 @@ export default function AdminPage() {
   function updateGroup(index: number, patch: Partial<DraftGroup>) {
     const groups = [...draft!.groups];
     groups[index] = { ...groups[index], ...patch };
-    setDraft({ ...draft!, groups });
+    setDraft({ ...draft!, groups, weightsConfirmed: false });
   }
 
   function addGroup() {

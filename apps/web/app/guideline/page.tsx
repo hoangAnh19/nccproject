@@ -14,10 +14,13 @@ const sections = [
     title: 'Cấu trúc',
     content: [
       'Bộ tiêu chí gồm 4 nhóm chính, mỗi nhóm có trọng số riêng. Điểm tổng được tính theo bình quân gia quyền của các nhóm, thang điểm 100.',
-      'A - Uy tín nhà cung cấp (Trọng số: 25%)',
-      'B - Năng lực nhà cung cấp (Trọng số: 30%)',
-      'C - Năng lực thực thi hợp đồng (Trọng số: 30%)',
-      'D - Phát triển bền vững ESG (Trọng số: 15%)',
+      'A - Uy tín nhà cung cấp (Trọng số theo bộ chốt: 15%)',
+      'B - Năng lực nhà cung cấp (Trọng số theo bộ chốt: 20%)',
+      'C - Năng lực thực thi hợp đồng (Trọng số theo bộ chốt: 40%)',
+      'D - Phát triển bền vững ESG (25% = 15% Nhà cung cấp + 10% Sản phẩm/Dịch vụ)',
+      'Trọng số Layer 1 cấu hình tại trang Admin; phải xác nhận trước khi chấm chính thức. D1/D2/D3/D4 khởi tạo 22/24/14/40%.',
+      'Chọn lĩnh vực và loại hình hợp đồng trước khi chấm. Mỗi hợp đồng có điểm C riêng; điểm C năm là trung bình cộng điểm các hợp đồng trong lĩnh vực.',
+      'N/A phải có lý do, loại khỏi mẫu số trong cùng Layer 1. Layer 1 không còn tiêu chí có điểm được loại khỏi cấu phần. Nếu toàn bộ ESG sản phẩm/dịch vụ không áp dụng, phần 10% được loại khỏi mẫu số tổng (còn 90%).',
     ],
   },
   {
@@ -37,6 +40,8 @@ const sections = [
       '3 điểm: Đáp ứng mức trung bình, cần theo dõi trong quá trình hợp tác.',
       '2 điểm: Đáp ứng hạn chế, tồn tại rủi ro cần kiểm soát.',
       '1 điểm: Không đáp ứng hoặc thiếu bằng chứng đánh giá.',
+      '0 điểm: Vi phạm nghiêm trọng, không đáp ứng hoặc không cung cấp minh chứng theo yêu cầu. Điểm 0 khác với N/A.',
+      'Thang điểm cụ thể: theo hướng dẫn từng tiêu chí, không tự mặc định 5 điểm. Đánh giá hàng năm; lưu minh chứng và lý do N/A.',
     ],
   },
   {
@@ -82,7 +87,7 @@ export default function GuidelinePage() {
         <h1 className="text-2xl font-bold text-ink">Bộ tiêu chí đánh giá nhà cung cấp CNTT - Ngân hàng</h1>
         <p className="mt-2 max-w-5xl text-sm leading-6 text-slate-600">
           Căn cứ: Luật Đấu thầu 22/2023/QH15, Nghị định 214/2025/NĐ-CP, QĐ BIDV 321 và các quy định hiện hành | Phiên
-          bản v2.0
+          bản chốt 14/09/2026 sau TGYK 11/09/2026
         </p>
       </header>
 

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "test": "npm run build && node --test test/scoring.test.cjs",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "build": "nest build",

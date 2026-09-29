@@ -37,6 +37,11 @@ export class EvaluationConfigsService {
   toFormSchema(config: EvaluationConfig) {
     return {
       id: config.id,
+      version: config.version,
+      scoringMethod: config.scoringMethod,
+      weightsConfirmed: config.weightsConfirmed,
+      procurementFields: config.procurementFields,
+      partners: config.partners,
       name: config.name,
       description: config.description,
       evaluationPeriod: config.evaluationPeriod,
@@ -55,6 +60,13 @@ export class EvaluationConfigsService {
             .filter((criterion) => criterion.isActive)
             .map((criterion) => ({
               id: criterion.id,
+              layer1Weight: criterion.layer1Weight,
+              scope: criterion.scope,
+              applicableFields: criterion.applicableFields,
+              allowedScores: criterion.allowedScores,
+              guidance: criterion.guidance,
+              sourceSheet: criterion.sourceSheet,
+              sourceRow: criterion.sourceRow,
               code: criterion.code,
               name: criterion.name,
               description: criterion.description,

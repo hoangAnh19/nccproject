@@ -8,4 +8,5 @@ npm-debug.log*
 Dockerfile.local
 mysql-data/
 .idea/
+.codex-test-db/
 docker-compose.yml

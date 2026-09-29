@@ -1,4 +1,4 @@
-export const defaultEvaluationConfig = {
+{
   "name": "Bộ tiêu chí đánh giá NCC CNTT 14/09/2026",
   "description": "Bộ tiêu chí chốt sau TGYK 11/09/2026. A/B/C: trọng số Layer 1 bằng nhau (giả định triển khai, có thể cấu hình).",
   "version": "2026-09-14",
@@ -2784,4 +2784,4 @@ export const defaultEvaluationConfig = {
       "sortOrder": 4
     }
   ]
-} as const;
+}

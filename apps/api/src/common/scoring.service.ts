@@ -1,9 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { EvaluationConfig, RankRule } from '../database/entities';
+import { AnnualContext, calculateAnnual } from './annual-scoring';
 
 export type SubmittedScore = {
   criterionId: string;
-  score: number;
+  score: number | null;
   note?: string;
 };
 
@@ -11,7 +12,7 @@ export type ScoreResult = {
   totalScore: number;
   rank: RankRule;
   groupScores: Array<{ groupId: string; code: string; name: string; score: number; weight: number }>;
-  itemScores: Array<{ criterionId: string; score: number; note?: string; normalizedScore: number }>;
+  itemScores: Array<{ criterionId: string; score: number | null; note?: string; normalizedScore: number }>;
 };
 
 const round2 = (value: number) => Math.round(value * 100) / 100;
@@ -42,7 +43,17 @@ export class ScoringService {
       if (activeCriteria.length === 0) {
         throw new BadRequestException(`Nhóm ${group.code} cần ít nhất một tiêu chí con đang bật`);
       }
-      if (config.useCriterionWeights) {
+      if (config.scoringMethod === 'layered') {
+        const layers = new Map<string, number>();
+        for (const criterion of activeCriteria) {
+          const weight = Number(criterion.layer1Weight);
+          if (!criterion.layer1Code || !Number.isFinite(weight) || weight < 0 || weight > 100) throw new BadRequestException('Trọng số Layer 1 không hợp lệ');
+          if (layers.has(criterion.layer1Code) && layers.get(criterion.layer1Code) !== weight) throw new BadRequestException('Trọng số trong cùng Layer 1 phải thống nhất');
+          layers.set(criterion.layer1Code, weight);
+          if (!['supplier', 'contract'].includes(criterion.scope)) throw new BadRequestException('Phạm vi tiêu chí không hợp lệ');
+        }
+        if (round2([...layers.values()].reduce((a,b) => a+b,0)) !== 100) throw new BadRequestException(`Tổng trọng số Layer 1 nhóm ${group.code} phải bằng 100%`);
+      } else if (config.useCriterionWeights) {
         const totalCriterionWeight = round2(
           activeCriteria.reduce((sum, criterion) => sum + Number(criterion.weight), 0),
         );
@@ -52,6 +63,19 @@ export class ScoringService {
           );
         }
       }
+    }
+
+    if (config.scoringMethod === 'layered') {
+      if (activeGroups.map(g => g.code).sort().join(',') !== 'A,B,C,D') throw new BadRequestException('Bộ tiêu chí cần đủ nhóm A, B, C, D');
+      for (const group of activeGroups) {
+        for (const criterion of group.criteria.filter(c => c.isActive)) {
+          const expected = group.code === 'C' || criterion.layer1Code === 'D4' ? 'contract' : 'supplier';
+          if (criterion.scope !== expected) throw new BadRequestException(`Phạm vi ${criterion.code} phải là ${expected}`);
+        }
+      }
+      const d = activeGroups.find(g => g.code === 'D')!;
+      const layers = [...new Map(d.criteria.filter(c => c.isActive).map(c => [c.layer1Code, c])).values()];
+      if (layers.filter(c => c.scope === 'supplier').reduce((s,c) => s+Number(c.layer1Weight),0) !== 60 || layers.filter(c => c.scope === 'contract').reduce((s,c) => s+Number(c.layer1Weight),0) !== 40) throw new BadRequestException('ESG cần 60% nhà cung cấp và 40% sản phẩm/dịch vụ');
     }
 
     this.validateRanks(activeRanks);
@@ -83,8 +107,16 @@ export class ScoringService {
     }
   }
 
-  calculate(config: EvaluationConfig, submittedScores: SubmittedScore[]): ScoreResult {
+  calculate(config: EvaluationConfig, submittedScores: SubmittedScore[], context?: AnnualContext) {
     this.validateConfig(config);
+    if (config.scoringMethod === 'layered') {
+      if (!context) throw new BadRequestException('Cần lĩnh vực và danh sách hợp đồng để tính điểm');
+      return calculateAnnual(config, submittedScores, context);
+    }
+
+    if (new Set(submittedScores.map(i => i.criterionId)).size !== submittedScores.length) throw new BadRequestException('Trùng tiêu chí');
+    const allowedIds = new Set(config.groups.filter(g => g.isActive).flatMap(g => g.criteria.filter(c => c.isActive).map(c => c.id)));
+    if (submittedScores.some(i => !allowedIds.has(i.criterionId))) throw new BadRequestException('Tiêu chí không thuộc cấu hình');
 
     const scoreMap = new Map(submittedScores.map((item) => [item.criterionId, item]));
     const activeGroups = [...config.groups]
@@ -103,7 +135,7 @@ export class ScoringService {
         if (!submitted) {
           throw new BadRequestException(`Thiếu điểm cho tiêu chí ${criterion.code}`);
         }
-        if (submitted.score < config.scaleMin || submitted.score > config.scaleMax) {
+        if (submitted.score === null || !Number.isInteger(submitted.score) || submitted.score < config.scaleMin || submitted.score > config.scaleMax) {
           throw new BadRequestException(`Điểm tiêu chí ${criterion.code} nằm ngoài thang cho phép`);
         }
         const normalizedScore = round2((submitted.score / config.scaleMax) * 100);

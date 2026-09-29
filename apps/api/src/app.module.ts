@@ -8,6 +8,7 @@ import { EvaluationsModule } from './evaluations/evaluations.module';
 import { ReportsModule } from './reports/reports.module';
 import { SuppliersModule } from './suppliers/suppliers.module';
 import { HealthController } from './health.controller';
+import { FinalCriteria1790640000000 } from './database/migrations/1790640000000-FinalCriteria';
 import {
   Evaluation,
   EvaluationConfig,
@@ -39,7 +40,10 @@ import {
         Evaluation,
         EvaluationItem,
       ],
-      synchronize: (process.env.DB_SYNC ?? 'true') === 'true',
+      synchronize: (process.env.DB_SYNC ?? 'false') === 'true',
+      migrations: [FinalCriteria1790640000000],
+      migrationsRun: true,
+      migrationsTransactionMode: 'none',
       charset: 'utf8mb4_unicode_ci',
     }),
     SuppliersModule,

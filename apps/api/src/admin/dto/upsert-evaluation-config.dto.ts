@@ -12,9 +12,30 @@ import {
   MaxLength,
   Min,
   ValidateNested,
+  IsIn,
 } from 'class-validator';
 
 export class UpsertCriterionDto {
+  @IsOptional() @IsNumber() @Min(0) @Max(100)
+  layer1Weight?: number;
+
+  @IsOptional() @IsIn(['supplier', 'contract'])
+  scope?: string;
+
+  @IsOptional() @IsArray() @IsString({ each: true })
+  applicableFields?: string[];
+
+  @IsOptional() @IsArray() @IsInt({ each: true }) @Min(0, { each: true }) @Max(5, { each: true })
+  allowedScores?: number[];
+
+  @IsOptional() @IsString()
+  guidance?: string;
+
+  @IsOptional() @IsString()
+  sourceSheet?: string;
+
+  @IsOptional() @IsInt()
+  sourceRow?: number;
   @IsOptional()
   @IsString()
   id?: string;
@@ -24,7 +45,7 @@ export class UpsertCriterionDto {
   code: string;
 
   @IsString()
-  @MaxLength(255)
+  @MaxLength(4000)
   name: string;
 
   @IsOptional()
@@ -146,7 +167,36 @@ export class UpsertRankRuleDto {
   isActive: boolean;
 }
 
+export class PartnerDto {
+  @IsString() @MaxLength(120)
+  field: string;
+  @IsString() @MaxLength(255)
+  name: string;
+  @IsInt() @Min(1) @Max(3)
+  tier: number;
+}
+
 export class UpsertEvaluationConfigDto {
+  @IsOptional() @IsString()
+  version?: string;
+
+  @IsOptional() @IsIn(['legacy', 'layered'])
+  scoringMethod?: string;
+
+  @IsOptional() @IsBoolean()
+  weightsConfirmed?: boolean;
+
+  @IsOptional() @IsArray() @IsString({ each: true })
+  procurementFields?: string[];
+
+  @IsOptional() @IsArray() @ValidateNested({ each: true }) @Type(() => PartnerDto)
+  partners?: PartnerDto[];
+
+  @IsOptional() @IsString()
+  sourceFile?: string;
+
+  @IsOptional() @IsString()
+  sourceHash?: string;
   @IsString()
   @MaxLength(255)
   name: string;

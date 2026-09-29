@@ -14,7 +14,7 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/state';
 const actionCards = [
   {
     title: 'Hướng dẫn',
-    description: 'Tài liệu hướng dẫn sử dụng bộ tiêu chí, thang điểm 1-5 và quy trình phân loại nhà cung cấp.',
+    description: 'Bộ tiêu chí chốt 14/09/2026, thang điểm 0–5, xử lý N/A và đánh giá hàng năm theo lĩnh vực.',
     cta: 'Đọc hướng dẫn',
     href: '/guideline',
     icon: iconGuideline,
@@ -28,7 +28,7 @@ const actionCards = [
   },
   {
     title: 'Báo cáo',
-    description: 'Xem tổng hợp kết quả, so sánh các kỳ đánh giá và xuất báo cáo Excel phục vụ phê duyệt.',
+    description: 'Xem tổng hợp kết quả và so sánh nhà cung cấp theo năm và lĩnh vực mua sắm.',
     cta: 'Xem báo cáo',
     href: '/reports',
     icon: iconReport,

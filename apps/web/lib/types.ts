@@ -26,6 +26,13 @@ export type ScoreOption = {
 };
 
 export type Criterion = {
+  layer1Weight?: number;
+  scope?: string;
+  applicableFields?: string[];
+  allowedScores?: number[];
+  guidance?: string;
+  sourceSheet?: string;
+  sourceRow?: number;
   id: string;
   code: string;
   name: string;
@@ -62,6 +69,13 @@ export type RankRule = {
 };
 
 export type EvaluationConfig = {
+  version?: string;
+  scoringMethod?: string;
+  weightsConfirmed?: boolean;
+  procurementFields?: string[];
+  partners?: Array<{ field: string; name: string; tier: number }>;
+  sourceFile?: string;
+  sourceHash?: string;
   id: string;
   name: string;
   description?: string;
@@ -78,7 +92,7 @@ export type EvaluationConfig = {
 
 export type EvaluationItem = {
   id: string;
-  score: number;
+  score: number | null;
   note?: string;
   normalizedScore: number;
   criterion?: Criterion;
@@ -86,6 +100,11 @@ export type EvaluationItem = {
 };
 
 export type Evaluation = {
+  procurementField?: string;
+  procurementTypes?: string[];
+  configSnapshot?: EvaluationConfig;
+  contracts?: Array<{ code: string; name: string; evaluator: string; procurementType: string; items: EvaluationItem[]; performanceScore: number; productScore: number | null }>;
+  calculationDetails?: { performance: number; supplierEsg: number; productEsg: number | null; effectiveWeight: number; explanation: string };
   id: string;
   supplierId?: string;
   configId?: string;

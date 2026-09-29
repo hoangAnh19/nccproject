@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ScoringService } from '../common/scoring.service';
 import {
   EvaluationConfig,
+  Evaluation,
   EvaluationCriterion,
   EvaluationGroup,
   RankRule,
@@ -45,25 +46,32 @@ export class AdminService {
   async create(dto: UpsertEvaluationConfigDto) {
     const config = this.hydrateConfig(this.configs.create(), dto);
     this.scoring.validateConfig(config);
-    if (config.isDefault) await this.clearDefault();
-    const saved = await this.configs.save(config);
+    const saved = await this.configs.manager.transaction(async manager => {
+      if (config.isDefault) await manager.update(EvaluationConfig, { isDefault: true }, { isDefault: false });
+      return manager.save(EvaluationConfig, config);
+    });
     return this.findOne(saved.id);
   }
 
   async update(id: string, dto: UpsertEvaluationConfigDto) {
     const config = await this.findOne(id);
-    await this.groups.delete({ configId: id });
-    await this.scoreOptions.delete({ configId: id });
-    await this.rankRules.delete({ configId: id });
     this.hydrateConfig(config, dto);
     this.scoring.validateConfig(config);
-    if (config.isDefault) await this.clearDefault(id);
-    const saved = await this.configs.save(config);
+    const saved = await this.configs.manager.transaction(async manager => {
+      await manager.findOneOrFail(EvaluationConfig, { where: { id }, lock: { mode: 'pessimistic_write' } });
+      if (await manager.existsBy(Evaluation, { configId: id })) throw new BadRequestException('Cấu hình đã có phiếu đánh giá. Hãy tạo bản sao để thay đổi, giữ nguyên lịch sử.');
+      await manager.delete(EvaluationGroup, { configId: id });
+      await manager.delete(ScoreOption, { configId: id });
+      await manager.delete(RankRule, { configId: id });
+      if (config.isDefault) await manager.update(EvaluationConfig, { isDefault: true }, { isDefault: false });
+      return manager.save(EvaluationConfig, config);
+    });
     return this.findOne(saved.id);
   }
 
   async remove(id: string) {
     const config = await this.findOne(id);
+    if (config.isDefault || config.version === '2026-09-14' || await this.configs.manager.existsBy(Evaluation, { configId: id })) throw new BadRequestException('Không xóa bộ tiêu chí gốc, mặc định hoặc đã có phiếu đánh giá');
     await this.configs.remove(config);
     return { deleted: true };
   }
@@ -90,6 +98,13 @@ export class AdminService {
 
   private hydrateConfig(config: EvaluationConfig, dto: UpsertEvaluationConfigDto) {
     Object.assign(config, {
+      version: dto.version,
+      scoringMethod: dto.scoringMethod ?? 'legacy',
+      weightsConfirmed: dto.weightsConfirmed ?? false,
+      procurementFields: dto.procurementFields,
+      partners: dto.partners,
+      sourceFile: dto.sourceFile,
+      sourceHash: dto.sourceHash,
       name: dto.name,
       description: dto.description,
       isActive: dto.isActive,
@@ -102,13 +117,14 @@ export class AdminService {
     config.groups = dto.groups.map((groupDto) =>
       this.groups.create({
         ...groupDto,
+        id: undefined,
         criteria: groupDto.criteria.map((criterionDto) =>
-          Object.assign(new EvaluationCriterion(), criterionDto),
+          Object.assign(new EvaluationCriterion(), criterionDto, { id: undefined }),
         ),
       }),
     );
-    config.scoreOptions = dto.scoreOptions.map((optionDto) => this.scoreOptions.create(optionDto));
-    config.rankRules = dto.rankRules.map((rankDto) => this.rankRules.create(rankDto));
+    config.scoreOptions = dto.scoreOptions.map((optionDto) => this.scoreOptions.create({ ...optionDto, id: undefined }));
+    config.rankRules = dto.rankRules.map((rankDto) => this.rankRules.create({ ...rankDto, id: undefined }));
     return config;
   }
 

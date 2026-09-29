@@ -20,4 +20,9 @@ export class EvaluationsController {
   create(@Body() dto: CreateEvaluationDto) {
     return this.evaluationsService.create(dto);
   }
+
+  @Post('preview')
+  preview(@Body() dto: CreateEvaluationDto) {
+    return this.evaluationsService.preview(dto);
+  }
 }

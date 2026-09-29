@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Not, Repository } from 'typeorm';
 import { Evaluation, Supplier } from '../database/entities';
+import { latestEvaluations } from './latest-evaluations';
 
 @Injectable()
 export class ReportsService {
@@ -19,10 +20,11 @@ export class ReportsService {
       this.evaluations.find({ order: { createdAt: 'ASC' } }),
     ]);
 
+    const latest = await this.suppliers.find({ where: { latestScore: Not(IsNull()) } });
     const averageScore =
-      evaluations.length === 0
+      latest.length === 0
         ? 0
-        : Math.round((evaluations.reduce((sum, evaluation) => sum + evaluation.totalScore, 0) / evaluations.length) * 100) /
+        : Math.round((latest.reduce((sum, supplier) => sum + Number(supplier.latestScore), 0) / latest.length) * 100) /
           100;
 
     return {
@@ -31,7 +33,7 @@ export class ReportsService {
       unevaluatedSuppliers: totalSuppliers - evaluatedSuppliers,
       averageScore,
       rankDistribution: await this.rankDistribution(),
-      scoreTrend: this.scoreTrend(evaluations),
+      scoreTrend: this.scoreTrend(latestEvaluations(evaluations)),
     };
   }
 
@@ -61,8 +63,17 @@ export class ReportsService {
     return this.suppliers.find({
       where: { latestScore: Not(IsNull()) },
       order: { latestScore: 'DESC' },
-      take: limit,
+      take: Number.isFinite(limit) ? Math.max(1, Math.min(100, Math.floor(limit))) : 5,
     });
+  }
+
+  async annual(field?: string, period?: string) {
+    const evaluations = await this.evaluations.find({
+      where: { procurementField: field || Not(IsNull()), ...(period ? { period } : {}) },
+      relations: { supplier: true }, order: { createdAt: 'DESC' },
+    });
+    const items = latestEvaluations(evaluations).sort((a,b) => b.totalScore-a.totalScore);
+    return { items, count: items.length, averageScore: items.length ? Math.round(items.reduce((s,e) => s+e.totalScore,0)/items.length*100)/100 : null };
   }
 
   private scoreTrend(evaluations: Evaluation[]) {

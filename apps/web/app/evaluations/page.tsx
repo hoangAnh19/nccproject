@@ -1,615 +1,166 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { ChevronDown, ChevronRight, ChevronsDown, ChevronsUp, Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { apiFetch, formatScore } from '@/lib/api';
-import type { Evaluation, EvaluationConfig, Supplier } from '@/lib/types';
-import { EmptyState, ErrorState, LoadingState } from '@/components/state';
+import type { Criterion, Evaluation, EvaluationConfig, Supplier } from '@/lib/types';
+import { ErrorState, LoadingState } from '@/components/state';
 
-type Scores = Record<string, { score: number; note: string }>;
-
-const includesText = (value: string | undefined | null, query: string) =>
-  (value ?? '').toLowerCase().includes(query.toLowerCase().trim());
-
-function createDefaultScores(config: EvaluationConfig) {
-  const initial: Scores = {};
-  config.groups.forEach((group) => {
-    group.criteria.forEach((criterion) => {
-      initial[criterion.id] = { score: config.scaleMax, note: '' };
-    });
-  });
-  return initial;
-}
-
-function getEvaluationSupplierId(evaluation: Evaluation) {
-  return evaluation.supplierId ?? evaluation.supplier?.id;
-}
-
-function findEvaluation(evaluations: Evaluation[], supplierId: string, period: string) {
-  return evaluations.find((evaluation) => getEvaluationSupplierId(evaluation) === supplierId && evaluation.period === period);
-}
-
-function getLatestSupplierEvaluation(evaluations: Evaluation[], supplierId: string) {
-  return evaluations.find((evaluation) => getEvaluationSupplierId(evaluation) === supplierId);
-}
-
-function hydrateScoresFromEvaluation(config: EvaluationConfig, evaluation: Evaluation) {
-  const nextScores = createDefaultScores(config);
-  const nextTouched: Record<string, boolean> = {};
-
-  evaluation.items?.forEach((item) => {
-    nextScores[item.criterionId] = {
-      score: item.score,
-      note: item.note ?? '',
-    };
-    nextTouched[item.criterionId] = true;
-  });
-
-  return { scores: nextScores, touchedCriteria: nextTouched };
-}
-
-function groupCriteriaByLayer(criteria: EvaluationConfig['groups'][number]['criteria']) {
-  const layers = new Map<
-    string,
-    {
-      code: string;
-      name: string;
-      criteria: EvaluationConfig['groups'][number]['criteria'];
-    }
-  >();
-
-  criteria.forEach((criterion) => {
-    const code = criterion.layer1Code ?? criterion.code.split('.')[0];
-    const name = criterion.layer1Name ?? 'Nhóm tiêu chí';
-    const current = layers.get(code) ?? { code, name, criteria: [] };
-    current.criteria.push(criterion);
-    layers.set(code, current);
-  });
-
-  return [...layers.values()];
-}
+type Answer = { score: number | null | ''; note: string };
+type Answers = Record<string, Answer>;
+type Contract = { code: string; name: string; evaluator: string; procurementType: string; answers: Answers };
+type Preview = { totalScore: number; rank: { code: string; name: string }; groupScores: Evaluation['groupScores']; calculationDetails?: Evaluation['calculationDetails'] };
+const input = 'w-full rounded border border-line bg-white px-3 py-2 text-sm text-slate-800';
+const applies = (c: Criterion, field: string, types: string[]) =>
+  (!c.applicableFields?.length || c.applicableFields.includes(field)) &&
+  (!c.applicableType || types.some(t => c.applicableType!.split(',').map(s => s.trim()).includes(t)));
+const blankContract = (): Contract => ({ code: '', name: '', evaluator: '', procurementType: 'Hàng hóa', answers: {} });
 
 export default function EvaluationsPage() {
+  const [config, setConfig] = useState<EvaluationConfig>();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-  const [config, setConfig] = useState<EvaluationConfig | null>(null);
-  const [evaluations, setEvaluations] = useState<Evaluation[]>([]);
+  const [history, setHistory] = useState<Evaluation[]>([]);
   const [supplierId, setSupplierId] = useState('');
-  const [supplierQuery, setSupplierQuery] = useState('');
-  const [periodSearch, setPeriodSearch] = useState('');
-  const [period, setPeriod] = useState('');
-  const [evaluator, setEvaluator] = useState('anhth12');
-  const [scores, setScores] = useState<Scores>({});
-  const [touchedCriteria, setTouchedCriteria] = useState<Record<string, boolean>>({});
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [period, setPeriod] = useState('2026');
+  const [field, setField] = useState('');
+  const [evaluator, setEvaluator] = useState('');
+  const [answers, setAnswers] = useState<Answers>({});
+  const [contracts, setContracts] = useState<Contract[]>([blankContract()]);
+  const [preview, setPreview] = useState<Preview>();
+  const [detail, setDetail] = useState<Evaluation>();
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-
-  // Collapse states for groups and sub-layers
-  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
-  const [collapsedLayers, setCollapsedLayers] = useState<Record<string, boolean>>({});
+  const [message, setMessage] = useState('');
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    Promise.all([
-      apiFetch<{ items: Supplier[] }>('/suppliers?limit=500'),
-      apiFetch<EvaluationConfig>('/evaluation-configs/default/form-schema'),
-      apiFetch<Evaluation[]>('/evaluations'),
-    ])
-      .then(([supplierData, configData, evaluationData]) => {
-        setSuppliers(supplierData.items ?? []);
-        setConfig(configData);
-        setEvaluations(evaluationData);
-        setPeriod(configData.evaluationPeriod);
-        setSupplierId(supplierData.items?.[0]?.id ?? '');
-        setScores(createDefaultScores(configData));
-      })
-      .catch((err: Error) => setError(err.message))
-      .finally(() => setLoading(false));
+    let cancelled = false;
+    async function load() {
+      const [schema, first, evaluations] = await Promise.all([
+        apiFetch<EvaluationConfig>('/evaluation-configs/default/form-schema'),
+        apiFetch<{ items: Supplier[]; totalPages: number }>('/suppliers?limit=100'),
+        apiFetch<Evaluation[]>('/evaluations'),
+      ]);
+      const all = [...first.items];
+      for (let page = 2; page <= first.totalPages; page++) all.push(...(await apiFetch<{ items: Supplier[] }>(`/suppliers?limit=100&page=${page}`)).items);
+      if (cancelled) return;
+      setConfig(schema); setPeriod(schema.evaluationPeriod); setSuppliers(all); setHistory(evaluations);
+    }
+    load().catch(e => { if (!cancelled) setError(e.message); });
+    return () => { cancelled = true; };
   }, []);
 
-  const filteredSuppliers = useMemo(() => {
-    if (!supplierQuery.trim()) return suppliers;
-    return suppliers.filter(
-      (supplier) =>
-        includesText(supplier.name, supplierQuery) ||
-        includesText(supplier.code, supplierQuery) ||
-        includesText(supplier.taxCode, supplierQuery),
-    );
-  }, [supplierQuery, suppliers]);
-
-  useEffect(() => {
-    if (filteredSuppliers.length === 0) {
-      setSupplierId('');
-      return;
-    }
-    if (!filteredSuppliers.some((supplier) => supplier.id === supplierId)) {
-      setSupplierId(filteredSuppliers[0].id);
-    }
-  }, [filteredSuppliers, supplierId]);
-
-  useEffect(() => {
-    if (!config || !supplierId) return;
-    const latestEvaluation = getLatestSupplierEvaluation(evaluations, supplierId);
-    setPeriod(latestEvaluation?.period ?? config.evaluationPeriod);
-  }, [config, evaluations, supplierId]);
-
-  const periodOptions = useMemo(() => {
-    const values = [config?.evaluationPeriod, ...evaluations.map((evaluation) => evaluation.period)].filter(Boolean);
-    return [...new Set(values as string[])].sort().reverse();
-  }, [config?.evaluationPeriod, evaluations]);
-
-  useEffect(() => {
-    if (!config) return;
-
-    const resetScores = () => {
-      setScores(createDefaultScores(config));
-      setTouchedCriteria({});
-    };
-
-    if (!supplierId || !period) {
-      resetScores();
-      return;
-    }
-
-    const existingEvaluation = findEvaluation(evaluations, supplierId, period);
-    if (!existingEvaluation) {
-      resetScores();
-      return;
-    }
-
-    let cancelled = false;
-    const applyEvaluation = (evaluation: Evaluation) => {
-      if (cancelled) return;
-      const hydrated = hydrateScoresFromEvaluation(config, evaluation);
-      setScores(hydrated.scores);
-      setTouchedCriteria(hydrated.touchedCriteria);
-      setEvaluator(evaluation.evaluator);
-    };
-
-    if (existingEvaluation.items?.length) {
-      applyEvaluation(existingEvaluation);
-    } else {
-      apiFetch<Evaluation>(`/evaluations/${existingEvaluation.id}`)
-        .then(applyEvaluation)
-        .catch((err: Error) => {
-          if (!cancelled) setError(err.message);
-        });
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [config, evaluations, period, supplierId]);
-
-  const filteredEvaluations = useMemo(() => {
-    return evaluations.filter((evaluation) => {
-      const supplierMatched =
-        !supplierQuery.trim() ||
-        includesText(evaluation.supplier?.name, supplierQuery) ||
-        includesText(evaluation.supplier?.code, supplierQuery) ||
-        includesText(evaluation.supplier?.taxCode, supplierQuery);
-      const periodMatched = !periodSearch.trim() || includesText(evaluation.period, periodSearch);
-      return supplierMatched && periodMatched;
-    });
-  }, [evaluations, periodSearch, supplierQuery]);
-
-  const preview = useMemo(() => {
-    if (!config) return null;
-    const groupScores = config.groups.map((group) => {
-      let raw = 0;
-      group.criteria.forEach((criterion) => {
-        const value = scores[criterion.id]?.score ?? config.scaleMin;
-        raw += config.useCriterionWeights ? (value * criterion.weight) / 100 : value / group.criteria.length;
-      });
-      return { ...group, score: (raw / config.scaleMax) * 100 };
-    });
-    const totalScore = groupScores.reduce((sum, group) => sum + (group.score * group.weight) / 100, 0);
-    const rank = config.rankRules.find((rule) => totalScore >= rule.minScore && totalScore <= rule.maxScore);
-    return { totalScore, rank, groupScores };
-  }, [config, scores]);
-
-  const totalCriteria = useMemo(() => {
-    return config?.groups.reduce((sum, group) => sum + group.criteria.length, 0) ?? 0;
-  }, [config]);
-
-  const enteredCriteria = useMemo(() => Object.keys(touchedCriteria).length, [touchedCriteria]);
-
-  const markCriterionTouched = (criterionId: string) => {
-    setTouchedCriteria((current) => ({ ...current, [criterionId]: true }));
-  };
-
-  const toggleGroup = (groupId: string) => {
-    setCollapsedGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
-  };
-
-  const toggleLayer = (layerCode: string) => {
-    setCollapsedLayers((prev) => ({ ...prev, [layerCode]: !prev[layerCode] }));
-  };
-
-  const handleExpandAll = () => {
-    setCollapsedGroups({});
-    setCollapsedLayers({});
-  };
-
-  const handleCollapseAll = () => {
-    if (!config) return;
-    const nextGroups: Record<string, boolean> = {};
-    const nextLayers: Record<string, boolean> = {};
-    config.groups.forEach((group) => {
-      nextGroups[group.id] = true;
-      const layers = groupCriteriaByLayer(group.criteria);
-      layers.forEach((layer) => {
-        nextLayers[layer.code] = true;
-      });
-    });
-    setCollapsedGroups(nextGroups);
-    setCollapsedLayers(nextLayers);
-  };
-
-  const submit = async (event: FormEvent) => {
-    event.preventDefault();
-    if (!config) return;
-    setSaving(true);
-    setError('');
-    setSuccess('');
+  if (!config) return error ? <ErrorState message={error} /> : <LoadingState label="Đang tải bộ tiêu chí" />;
+  const allCriteria = config.groups.flatMap(g => g.criteria);
+  const types = [...new Set(contracts.map(c => c.procurementType))];
+  const supplierCriteria = allCriteria.filter(c => c.scope === 'supplier' && applies(c, field, types));
+  const contractCriteria = (contract: Contract) => allCriteria.filter(c => c.scope === 'contract' && applies(c, field, [contract.procurementType]));
+  const draftKey = `ncc-draft:${config.id}:${supplierId}:${period}:${field}`;
+  const invalidate = () => { setPreview(undefined); setMessage(''); setError(''); };
+  const serialize = (criteria: Criterion[], values: Answers) => criteria.map(c => {
+    const answer = values[c.id];
+    if (!answer || answer.score === '') throw new Error(`Chưa chấm tiêu chí ${c.code}`);
+    if (answer.score === null && !answer.note.trim()) throw new Error(`Cần lý do N/A cho ${c.code}`);
+    return { criterionId: c.id, score: answer.score, note: answer.note };
+  });
+  const payload = () => ({ supplierId, configId: config.id, period, evaluator, procurementField: field,
+    items: serialize(supplierCriteria, answers),
+    contracts: contracts.map(c => ({ code: c.code, name: c.name, evaluator: c.evaluator, procurementType: c.procurementType, items: serialize(contractCriteria(c), c.answers) })),
+  });
+  async function calculate(save: boolean) {
+    setBusy(true); setError(''); setMessage(''); setPreview(undefined);
     try {
-      const payload = {
-        supplierId,
-        configId: config.id,
-        period,
-        evaluator,
-        items: Object.entries(scores).map(([criterionId, value]) => ({
-          criterionId,
-          score: Number(value.score),
-          note: value.note,
-        })),
-      };
-      const saved = await apiFetch<Evaluation>('/evaluations', {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      });
-      setSuccess(`Đã lưu đánh giá ${saved.rankCode} với ${formatScore(saved.totalScore)} điểm`);
-      setEvaluations([saved, ...evaluations]);
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const saveDraft = () => {
-    if (!config) return;
-    localStorage.setItem(
-      'ncc-evaluation-draft',
-      JSON.stringify({
-        supplierId,
-        configId: config.id,
-        period,
-        evaluator,
-        scores,
-        touchedCriteria,
-        savedAt: new Date().toISOString(),
-      }),
-    );
-    setSuccess('Đã lưu nháp đánh giá trên trình duyệt');
-  };
-
-  if (loading) return <LoadingState label="Đang tải form đánh giá" />;
-  if (error && !config) return <ErrorState message={error} />;
-  if (!config) return <EmptyState message="Chưa có cấu hình đánh giá mặc định" />;
-
-  return (
-    <div className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-bold text-ink">Đánh giá nhà cung cấp</h1>
-        <p className="mt-1 text-sm text-slate-600">{config.name} - form sinh từ cấu hình trong database.</p>
-      </header>
-
-      {error && <ErrorState message={error} />}
-      {success && (
-        <div className="rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
-          {success}
-        </div>
-      )}
-
-      <form onSubmit={submit} className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_320px] xl:gap-6">
-        <section className="space-y-4">
-          <div className="grid gap-3 rounded-md border border-line bg-white p-3 sm:p-4 md:grid-cols-2 2xl:grid-cols-4">
-            <label className="relative text-sm">
-              <span className="mb-1 block text-xs font-medium text-slate-600">Tìm nhà cung cấp</span>
-              <Search className="absolute left-3 top-8 text-slate-400" size={16} />
-              <input
-                value={supplierQuery}
-                onChange={(event) => setSupplierQuery(event.target.value)}
-                placeholder="Tên, mã, mã số thuế"
-                className="focus-ring w-full rounded-md border border-line py-2 pl-9 pr-3"
-              />
-            </label>
-            <label className="text-sm">
-              <span className="mb-1 block text-xs font-medium text-slate-600">Nhà cung cấp</span>
-              <select
-                value={supplierId}
-                disabled={filteredSuppliers.length === 0}
-                onChange={(event) => setSupplierId(event.target.value)}
-                className="focus-ring w-full rounded-md border border-line px-3 py-2 disabled:bg-slate-100"
-              >
-                {filteredSuppliers.map((supplier) => (
-                  <option key={supplier.id} value={supplier.id}>
-                    {supplier.code} - {supplier.name}
-                  </option>
-                ))}
+      const body = JSON.stringify(payload());
+      if (save) {
+        const saved = await apiFetch<Evaluation>('/evaluations', { method: 'POST', body });
+        setHistory(current => [saved, ...current]); setDetail(saved);
+        localStorage.removeItem(draftKey);
+        setMessage(`Đã lưu phiếu năm ${period} · ${field}: ${formatScore(saved.totalScore)} điểm, loại ${saved.rankCode}`);
+      } else setPreview(await apiFetch<Preview>('/evaluations/preview', { method: 'POST', body }));
+    } catch (e) { setError((e as Error).message); }
+    finally { setBusy(false); }
+  }
+  function draft(restore: boolean) {
+    try {
+      if (restore) {
+        const raw = localStorage.getItem(draftKey);
+        if (!raw) throw new Error('Không có bản nháp cho nhà cung cấp, năm và lĩnh vực đang chọn');
+        const saved = JSON.parse(raw);
+        setEvaluator(saved.evaluator); setAnswers(saved.answers); setContracts(saved.contracts); invalidate();
+        setMessage('Đã khôi phục bản nháp');
+      } else {
+        localStorage.setItem(draftKey, JSON.stringify({ evaluator, answers, contracts }));
+        setMessage('Đã lưu nháp trên trình duyệt');
+      }
+    } catch (e) { setError((e as Error).message); }
+  }
+  async function view(id: string) {
+    try { setDetail(await apiFetch<Evaluation>(`/evaluations/${id}`)); } catch (e) { setError((e as Error).message); }
+  }
+  function renderCriteria(criteria: Criterion[], values: Answers, update: (next: Answers) => void) {
+    const layers = [...new Set(criteria.map(c => c.layer1Code))];
+    return layers.map(layer => {
+      const list = criteria.filter(c => c.layer1Code === layer);
+      return <details key={layer} className="rounded border border-line bg-white" open>
+        <summary className="cursor-pointer bg-slate-50 p-3 font-semibold">{layer} · {list[0].layer1Name} <span className="text-xs font-normal">({list[0].layer1Weight}% nhóm · {list.length} tiêu chí áp dụng)</span></summary>
+        {list.map(c => <div key={c.id} className="space-y-2 border-t border-line p-4">
+          <p className="font-medium">{c.code} · {c.name}</p>
+          <p className="whitespace-pre-line text-sm leading-6 text-slate-600">{c.guidance || c.description}</p>
+          <div className="grid gap-3 md:grid-cols-[230px_1fr]">
+            <label className="text-xs">Điểm / Không áp dụng
+              <select aria-label={`Điểm ${c.code}`} className={input} value={values[c.id]?.score === null ? 'NA' : values[c.id]?.score ?? ''} onChange={e => { invalidate(); update({ ...values, [c.id]: { note: values[c.id]?.note ?? '', score: e.target.value === 'NA' ? null : e.target.value === '' ? '' : Number(e.target.value) } }); }}>
+                <option value="">Chưa đánh giá</option>
+                {(c.allowedScores ?? config!.scoreOptions.map(o => o.value)).map(score => <option key={score} value={score}>{score} điểm</option>)}
+                <option value="NA">N/A · Không phát sinh/áp dụng</option>
               </select>
             </label>
-            <label className="text-sm">
-              <span className="mb-1 block text-xs font-medium text-slate-600">Kỳ đánh giá</span>
-              <input
-                list="period-options"
-                value={period}
-                onChange={(event) => setPeriod(event.target.value)}
-                className="focus-ring w-full rounded-md border border-line px-3 py-2"
-              />
-              <datalist id="period-options">
-                {periodOptions.map((item) => (
-                  <option key={item} value={item} />
-                ))}
-              </datalist>
-            </label>
-            <label className="text-sm">
-              <span className="mb-1 block text-xs font-medium text-slate-600">Người đánh giá</span>
-              <input
-                value={evaluator}
-                onChange={(event) => setEvaluator(event.target.value)}
-                className="focus-ring w-full rounded-md border border-line px-3 py-2"
-              />
+            <label className="text-xs">Minh chứng / Ghi chú / Lý do N/A
+              <textarea aria-label={`Minh chứng ${c.code}`} className={input} value={values[c.id]?.note ?? ''} onChange={e => { invalidate(); update({ ...values, [c.id]: { score: values[c.id]?.score ?? (values[c.id]?.score === null ? null : ''), note: e.target.value } }); }} placeholder="Tên hồ sơ, đường dẫn minh chứng hoặc lý do không áp dụng" />
             </label>
           </div>
+          <details className="text-xs text-slate-500"><summary className="cursor-pointer">Nguồn khảo sát · {c.sourceSheet}, dòng {c.sourceRow}</summary><p className="whitespace-pre-line py-2">{c.source}</p></details>
+          {c.code === 'A5.1' && <details className="text-sm"><summary className="cursor-pointer">Tra cứu đối tác–Tier trong lĩnh vực {field}</summary>
+            <p className="py-2 text-xs">Tier 1: 5 điểm · Tier 2: 4 điểm · Tier 3: 3 điểm. Hãng chưa có tên áp dụng Tier thấp nhất của lĩnh vực; ghi minh chứng để đầu mối xem xét.</p>
+            <div className="grid gap-1 sm:grid-cols-2">{config!.partners?.filter(p => p.field === field).map(p => <p key={p.name}>{p.name} · Tier {p.tier}</p>)}</div>
+          </details>}
+        </div>)}
+      </details>;
+    });
+  }
 
-          {filteredSuppliers.length === 0 && <EmptyState message="Không tìm thấy nhà cung cấp phù hợp để đánh giá" />}
-
-          {/* Quick Collapse / Expand All controls */}
-          <div className="flex flex-col gap-2 px-1 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
-            <span className="font-semibold text-slate-700">Các nhóm tiêu chí đánh giá ({config.groups.length} nhóm)</span>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-              <button
-                type="button"
-                onClick={handleExpandAll}
-                className="flex items-center gap-1 font-medium text-accent hover:underline"
-              >
-                <ChevronsDown size={14} />
-                Mở rộng tất cả
-              </button>
-              <button
-                type="button"
-                onClick={handleCollapseAll}
-                className="flex items-center gap-1 font-medium text-slate-600 hover:underline"
-              >
-                <ChevronsUp size={14} />
-                Thu gọn tất cả
-              </button>
-            </div>
-          </div>
-
-          {config.groups.map((group) => {
-            const isGroupCollapsed = Boolean(collapsedGroups[group.id]);
-            const layers = groupCriteriaByLayer(group.criteria);
-            const totalCriteriaCount = group.criteria.length;
-
-            return (
-              <div key={group.id} className="rounded-md border border-line bg-white shadow-2xs overflow-hidden">
-                {/* Group Header - Clickable to collapse */}
-                <div
-                  onClick={() => toggleGroup(group.id)}
-                  className="flex cursor-pointer flex-col gap-2 border-b border-line bg-slate-50/80 px-3 py-3 transition hover:bg-slate-100/80 sm:flex-row sm:items-center sm:justify-between sm:px-4"
-                >
-                  <div className="flex items-center gap-2">
-                    {isGroupCollapsed ? (
-                      <ChevronRight size={18} className="text-slate-500" />
-                    ) : (
-                      <ChevronDown size={18} className="text-slate-500" />
-                    )}
-                    <h2 className="font-semibold text-ink">
-                      {group.code}. {group.name}
-                    </h2>
-                    <span className="shrink-0 rounded bg-slate-200 px-2 py-0.5 text-xs text-slate-600 font-medium">
-                      {totalCriteriaCount} tiêu chí
-                    </span>
-                  </div>
-                  <span className="text-sm font-semibold text-slate-600">Trọng số nhóm {group.weight}%</span>
-                </div>
-
-                {/* Group Content */}
-                {!isGroupCollapsed && (
-                  <div className="divide-y divide-line">
-                    {layers.map((layer) => {
-                      const isLayerCollapsed = Boolean(collapsedLayers[layer.code]);
-                      return (
-                        <div key={layer.code}>
-                          {/* Layer Sub-header */}
-                          <div
-                            onClick={() => toggleLayer(layer.code)}
-                            className="flex cursor-pointer items-center justify-between gap-3 bg-slate-100/60 px-3 py-2.5 text-sm font-semibold text-ink transition hover:bg-slate-200/60 sm:px-4 sm:pl-6"
-                          >
-                            <div className="flex items-center gap-2">
-                              {isLayerCollapsed ? (
-                                <ChevronRight size={16} className="text-slate-400" />
-                              ) : (
-                                <ChevronDown size={16} className="text-slate-400" />
-                              )}
-                              <span>
-                                {layer.code}. {layer.name}
-                              </span>
-                            </div>
-                            <span className="text-xs font-normal text-slate-500">
-                              {layer.criteria.length} tiêu chí
-                            </span>
-                          </div>
-
-                          {/* Criteria list inside layer */}
-                          {!isLayerCollapsed && (
-                            <div className="divide-y divide-line">
-                              {layer.criteria.map((criterion) => (
-                                <div key={criterion.id} className="grid gap-3 px-3 py-3 sm:px-4 sm:pl-8 2xl:grid-cols-[1fr_220px_1fr]">
-                                  <div>
-                                    <div className="font-medium text-ink">
-                                      {criterion.code}. {criterion.name}
-                                    </div>
-                                    <div className="mt-1 text-xs text-slate-500">
-                                      Trọng số {formatScore(criterion.weight)}% · Áp dụng:{' '}
-                                      {criterion.applicableType ?? 'Tất cả'}
-                                    </div>
-                                    {criterion.description && (
-                                      <div className="mt-2 whitespace-pre-line text-xs leading-5 text-slate-600">
-                                        {criterion.description}
-                                      </div>
-                                    )}
-                                  </div>
-                                  <select
-                                    value={scores[criterion.id]?.score ?? config.scaleMin}
-                                    onChange={(event) => {
-                                      markCriterionTouched(criterion.id);
-                                      setScores({
-                                        ...scores,
-                                        [criterion.id]: {
-                                          ...scores[criterion.id],
-                                          score: Number(event.target.value),
-                                        },
-                                      });
-                                    }}
-                                    className="focus-ring rounded-md border border-line px-3 py-2 text-sm bg-white"
-                                  >
-                                    {config.scoreOptions.map((option) => (
-                                      <option key={option.id} value={option.value}>
-                                        {option.value} - {option.label}
-                                      </option>
-                                    ))}
-                                  </select>
-                                  <input
-                                    value={scores[criterion.id]?.note ?? ''}
-                                    onChange={(event) => {
-                                      markCriterionTouched(criterion.id);
-                                      setScores({
-                                        ...scores,
-                                        [criterion.id]: {
-                                          ...scores[criterion.id],
-                                          note: event.target.value,
-                                        },
-                                      });
-                                    }}
-                                    placeholder="Ghi chú tiêu chí"
-                                    className="focus-ring rounded-md border border-line px-3 py-2 text-sm"
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </section>
-
-        <aside className="mx-auto h-fit w-full max-w-md rounded-xl bg-[#087b72] px-4 py-5 text-white shadow-sm sm:px-5 sm:py-6 lg:sticky lg:top-4 lg:mx-0 lg:max-w-none">
-          <h2 className="text-center text-lg font-bold">Bảng điểm thời gian thực</h2>
-          <div className="mt-5 border-t border-white/15 pt-5">
-            <div className="space-y-3">
-              {preview?.groupScores.map((group) => (
-                <div key={group.id} className="grid grid-cols-[1fr_72px] items-baseline gap-3">
-                  <span className="min-w-0 text-sm font-medium leading-5 text-white/75">
-                    {group.code}. {group.name}
-                  </span>
-                  <span className="text-right text-lg font-bold">{formatScore(group.score)}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-5 border-t border-dashed border-white/15 pt-5">
-            <div className="flex items-baseline justify-between gap-5">
-              <span className="text-lg font-medium">Tổng điểm</span>
-              <span className="text-3xl font-bold">{preview ? formatScore(preview.totalScore) : '0.00'}</span>
-            </div>
-            <div className="mt-4 text-center text-sm font-semibold">
-              Đã nhập: {enteredCriteria} / {totalCriteria} tiêu chí
-            </div>
-          </div>
-
-          <div className="mt-5">
-            {preview?.rank ? (
-              <div
-                className="rounded-full bg-white px-4 py-3 text-center text-sm font-bold"
-                style={{ color: preview.rank.color }}
-              >
-                {preview.rank.code} - {preview.rank.name}
-              </div>
-            ) : (
-              <div className="rounded-full bg-white px-4 py-3 text-center text-sm font-bold text-red-600">
-                Chưa khớp rank
-              </div>
-            )}
-          </div>
-
-          <div className="mt-5 grid grid-cols-2 gap-3">
-            <button
-              disabled={saving || !supplierId}
-              className="focus-ring rounded-lg bg-[#c9ad57] px-3 py-3 text-sm font-bold text-white transition hover:bg-[#b99c45] disabled:opacity-60"
-            >
-              {saving ? 'Đang lưu' : 'Hoàn thành'}
-            </button>
-            <button
-              type="button"
-              disabled={!supplierId}
-              onClick={saveDraft}
-              className="focus-ring rounded-lg bg-white px-3 py-3 text-sm font-bold text-[#006f68] transition hover:bg-slate-50 disabled:opacity-60"
-            >
-              Lưu nháp
-            </button>
-          </div>
-        </aside>
-      </form>
-
-      <section className="rounded-md border border-line bg-white">
-        <div className="grid gap-3 border-b border-line px-5 py-4 md:grid-cols-[1fr_260px]">
-          <div className="font-semibold text-ink">Lịch sử đánh giá</div>
-          <label className="relative text-sm">
-            <Search className="absolute left-3 top-2.5 text-slate-400" size={16} />
-            <input
-              value={periodSearch}
-              onChange={(event) => setPeriodSearch(event.target.value)}
-              placeholder="Tìm kỳ đánh giá"
-              className="focus-ring w-full rounded-md border border-line py-2 pl-9 pr-3"
-            />
-          </label>
-        </div>
-        {filteredEvaluations.length === 0 ? (
-          <div className="p-5">
-            <EmptyState message="Không có phiếu đánh giá phù hợp" />
-          </div>
-        ) : (
-          <div className="divide-y divide-line">
-            {filteredEvaluations.slice(0, 12).map((evaluation) => (
-              <div key={evaluation.id} className="grid gap-2 px-4 py-3 text-sm md:grid-cols-[1fr_100px_120px_140px] md:items-center md:gap-3 md:px-5">
-                <div>
-                  <div className="font-semibold">{evaluation.supplier?.name}</div>
-                  <div className="text-slate-500">
-                    {evaluation.period} - {evaluation.evaluator}
-                  </div>
-                </div>
-                <div className="font-semibold md:text-right">{formatScore(evaluation.totalScore)}</div>
-                <div className="md:text-center">
-                  <span className="rounded px-2 py-1 text-xs font-semibold text-white" style={{ backgroundColor: evaluation.rankColor }}>
-                    {evaluation.rankCode}
-                  </span>
-                </div>
-                <div className="text-slate-500 md:text-right">{new Date(evaluation.createdAt).toLocaleDateString('vi-VN')}</div>
-              </div>
-            ))}
-          </div>
-        )}
+  return <div className="space-y-6">
+    <header><h1 className="text-2xl font-bold">Đánh giá nhà cung cấp theo năm</h1><p className="mt-1 text-sm text-slate-600">{config.name} · Xếp hạng theo từng lĩnh vực</p></header>
+    {!config.weightsConfirmed && <div className="rounded border border-amber-300 bg-amber-50 p-4 text-sm">Trọng số chưa được xác nhận. <Link className="font-semibold underline" href="/admin">Cấu hình trọng số trên trang quản trị</Link> trước khi hoàn thành phiếu. Bạn vẫn có thể nhập nháp và tính thử.</div>}
+    {error && <ErrorState message={error} />}{message && <p role="status" className="rounded bg-emerald-50 p-4 text-emerald-800">{message}</p>}
+    <section className="grid gap-4 rounded border border-line bg-white p-4 md:grid-cols-2">
+      <label className="text-sm">Nhà cung cấp<select className={input} value={supplierId} onChange={e => { setSupplierId(e.target.value); setAnswers({}); setContracts([blankContract()]); invalidate(); }}><option value="">Chọn nhà cung cấp</option>{suppliers.map(s => <option key={s.id} value={s.id}>{s.code} · {s.name}</option>)}</select></label>
+      <label className="text-sm">Năm đánh giá<input className={input} value={period} maxLength={4} onChange={e => { setPeriod(e.target.value); setAnswers({}); setContracts([blankContract()]); invalidate(); }} /></label>
+      <label className="text-sm">Lĩnh vực mua sắm<select className={input} value={field} onChange={e => { setField(e.target.value); setAnswers({}); setContracts([blankContract()]); invalidate(); }}><option value="">Chọn lĩnh vực trước khi chấm</option>{config.procurementFields?.map(f => <option key={f}>{f}</option>)}</select></label>
+      <label className="text-sm">Đầu mối đánh giá nhà cung cấp<input className={input} value={evaluator} onChange={e => { setEvaluator(e.target.value); invalidate(); }} /></label>
+    </section>
+    {supplierId && field && <>
+      <section className="space-y-3"><h2 className="text-lg font-semibold">1. Hợp đồng thuộc lĩnh vực {field} trong năm {period}</h2><p className="text-sm text-slate-600">Khai báo đủ hợp đồng để xác định loại hình áp dụng. C được tính bình quân điểm các hợp đồng, không theo giá trị hợp đồng.</p>
+        {contracts.map((contract, index) => <div key={index} className="grid gap-3 rounded border border-line bg-white p-4 md:grid-cols-2 xl:grid-cols-5">
+          {(['code', 'name', 'evaluator'] as const).map((key, i) => <label key={key} className="text-xs">{['Mã hợp đồng', 'Tên hợp đồng', 'Đơn vị/người đánh giá hợp đồng'][i]}<input className={input} value={contract[key]} onChange={e => { setContracts(contracts.map((c,j) => j === index ? { ...c, [key]: e.target.value } : c)); invalidate(); }} /></label>)}
+          <label className="text-xs">Loại hình<select className={input} value={contract.procurementType} onChange={e => { setContracts(contracts.map((c,j) => j === index ? { ...c, procurementType: e.target.value, answers: {} } : c)); invalidate(); }}>{['Hàng hóa','TV','PTV'].map(t => <option key={t}>{t}</option>)}</select></label>
+          <button className="text-sm text-red-700" disabled={contracts.length === 1} onClick={() => { setContracts(contracts.filter((_,j) => j !== index)); invalidate(); }}>Bỏ hợp đồng</button>
+        </div>)}
+        <button className="rounded border border-line bg-white px-4 py-2" onClick={() => { setContracts([...contracts, blankContract()]); invalidate(); }}>+ Thêm hợp đồng</button>
       </section>
-    </div>
-  );
+      <section className="space-y-3"><h2 className="text-lg font-semibold">2. Hồ sơ nhà cung cấp · A, B và ESG nhà cung cấp</h2><p className="text-sm text-slate-600">Đầu mối nhập một lần trong phiếu năm, dùng chung cho các hợp đồng trong lĩnh vực này.</p>{renderCriteria(supplierCriteria, answers, setAnswers)}</section>
+      <section className="space-y-4"><h2 className="text-lg font-semibold">3. Đánh giá từng hợp đồng · C và ESG sản phẩm/dịch vụ</h2>{contracts.map((c,index) => <details key={index} open className="space-y-3 rounded-lg border-2 border-teal-100 p-4"><summary className="cursor-pointer text-lg font-semibold">{c.code || `Hợp đồng ${index+1}`} · {c.name} · {c.procurementType}</summary>{renderCriteria(contractCriteria(c), c.answers, next => setContracts(contracts.map((contract,j) => j === index ? { ...contract, answers: next } : contract)))}</details>)}</section>
+      <section className="sticky bottom-0 space-y-3 rounded border border-line bg-white p-4 shadow-lg">
+        <p className="text-sm">0 là điểm không đáp ứng; N/A loại khỏi mẫu số và cần lý do. Không tự chấm điểm cho ô chưa nhập.</p>
+        {preview && <div className="rounded bg-teal-50 p-3"><p className="text-xl font-bold">{formatScore(preview.totalScore)} / 100 · {preview.rank.code} – {preview.rank.name}</p><p className="text-sm">{preview.groupScores.map(g => `${g.code}: ${formatScore(g.score)} × ${formatScore(g.weight)}%`).join(' · ')}</p><p className="text-xs">{preview.calculationDetails?.explanation}</p></div>}
+        <div className="flex flex-wrap gap-3"><button disabled={busy} onClick={() => calculate(false)} className="rounded border px-4 py-2">Tính thử</button><button disabled={busy || !config.weightsConfirmed} onClick={() => calculate(true)} className="rounded bg-teal-700 px-4 py-2 font-semibold text-white disabled:opacity-40">{busy ? 'Đang xử lý…' : 'Hoàn thành phiếu năm'}</button><button onClick={() => draft(false)} className="rounded border px-4 py-2">Lưu nháp</button><button onClick={() => draft(true)} className="rounded border px-4 py-2">Khôi phục nháp</button></div>
+      </section>
+    </>}
+    <section className="space-y-3"><h2 className="text-lg font-semibold">Lịch sử đánh giá {supplierId ? 'nhà cung cấp đang chọn' : ''}</h2>
+      {history.filter(e => !supplierId || e.supplierId === supplierId).map(e => <button key={e.id} onClick={() => view(e.id)} className="flex w-full flex-wrap justify-between gap-2 rounded border border-line bg-white p-3 text-left text-sm"><span>{e.supplier?.name} · {e.period} · {e.procurementField || 'Bộ tiêu chí cũ'}</span><strong>{formatScore(e.totalScore)} · {e.rankCode}</strong></button>)}
+    </section>
+    {detail && <section className="space-y-3 rounded border border-teal-200 bg-white p-4"><button className="float-right" onClick={() => setDetail(undefined)}>Đóng</button><h2 className="font-semibold">Phiếu {detail.period} · {detail.procurementField || 'Lịch sử'}</h2><p>{detail.evaluator} · {formatScore(detail.totalScore)} điểm · {detail.rankName}</p><p className="text-xs">{detail.configSnapshot?.name || 'Cấu hình lịch sử'} · {new Date(detail.createdAt).toLocaleString('vi-VN')}</p>
+      {(detail.items ?? []).map(item => <p key={item.id || item.criterionId} className="text-sm">{item.criterion?.code || detail.configSnapshot?.groups.flatMap(g => g.criteria).find(c => c.id === item.criterionId)?.code}: {item.score === null ? 'N/A' : item.score} · {item.note}</p>)}
+      {detail.contracts?.map(c => <details key={c.code}><summary>{c.code} · {c.name} · C: {formatScore(c.performanceScore)} · ESG SP/DV: {c.productScore === null ? 'N/A' : formatScore(c.productScore)}</summary><p className="text-xs">{c.evaluator} · {c.procurementType}</p>{c.items.map(i => <p key={i.criterionId} className="text-sm">{detail.configSnapshot?.groups.flatMap(g => g.criteria).find(k => k.id === i.criterionId)?.code}: {i.score === null ? 'N/A' : i.score} · {i.note}</p>)}</details>)}
+      {detail.configId === config.id && detail.supplierId === supplierId && detail.period === period && detail.procurementField === field && <button className="rounded border px-3 py-2" onClick={() => { setAnswers(Object.fromEntries((detail.items ?? []).map(i => [i.criterionId, { score: i.score, note: i.note ?? '' }]))); setEvaluator(detail.evaluator); setContracts((detail.contracts ?? []).map(c => ({ ...c, answers: Object.fromEntries(c.items.map(i => [i.criterionId, { score: i.score, note: i.note ?? '' }])) }))); invalidate(); setMessage('Đã nạp dữ liệu để lập phiên bản phiếu mới; bản lịch sử được giữ nguyên.'); }}>Nạp phiếu để cập nhật</button>}
+    </section>}
+  </div>;
 }

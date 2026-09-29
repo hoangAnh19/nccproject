@@ -2,7 +2,7 @@ const clientBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:13001
 const serverBaseUrl = process.env.API_URL ?? clientBaseUrl;
 
 export function apiBaseUrl() {
-  return typeof window === 'undefined' ? serverBaseUrl : clientBaseUrl;
+  return typeof window === 'undefined' ? serverBaseUrl : '/api/backend';
 }
 
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {

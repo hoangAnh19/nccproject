@@ -71,6 +71,27 @@ export class EvaluationConfig {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ nullable: true })
+  version?: string;
+
+  @Column({ default: 'legacy' })
+  scoringMethod: string;
+
+  @Column({ default: false })
+  weightsConfirmed: boolean;
+
+  @Column({ type: 'json', nullable: true })
+  procurementFields?: string[];
+
+  @Column({ type: 'json', nullable: true })
+  partners?: Array<{ field: string; name: string; tier: number }>;
+
+  @Column({ type: 'text', nullable: true })
+  sourceFile?: string;
+
+  @Column({ nullable: true })
+  sourceHash?: string;
+
   @Column()
   name: string;
 
@@ -163,8 +184,29 @@ export class EvaluationCriterion {
   @Column()
   code: string;
 
-  @Column()
+  @Column({ type: 'text' })
   name: string;
+
+  @Column({ type: 'double', nullable: true })
+  layer1Weight?: number;
+
+  @Column({ default: 'supplier' })
+  scope: string;
+
+  @Column({ type: 'json', nullable: true })
+  applicableFields?: string[];
+
+  @Column({ type: 'json', nullable: true })
+  allowedScores?: number[];
+
+  @Column({ type: 'text', nullable: true })
+  guidance?: string;
+
+  @Column({ nullable: true })
+  sourceSheet?: string;
+
+  @Column({ type: 'int', nullable: true })
+  sourceRow?: number;
 
   @Column({ type: 'text', nullable: true })
   description?: string;
@@ -274,6 +316,25 @@ export class Evaluation {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ nullable: true })
+  procurementField?: string;
+
+  @Column({ type: 'json', nullable: true })
+  procurementTypes?: string[];
+
+  @Column({ type: 'json', nullable: true })
+  configSnapshot?: Record<string, unknown>;
+
+  @Column({ type: 'json', nullable: true })
+  contracts?: Array<{
+    code: string; name: string; procurementType: string; evaluator: string;
+    items: Array<{ criterionId: string; score: number | null; note?: string }>;
+    performanceScore: number; productScore: number | null;
+  }>;
+
+  @Column({ type: 'json', nullable: true })
+  calculationDetails?: Record<string, unknown>;
+
   @Column()
   period: string;
 
@@ -325,8 +386,8 @@ export class EvaluationItem {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'int' })
-  score: number;
+  @Column({ type: 'int', nullable: true })
+  score: number | null;
 
   @Column({ type: 'text', nullable: true })
   note?: string;

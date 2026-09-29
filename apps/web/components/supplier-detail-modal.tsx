@@ -310,7 +310,7 @@ function EvaluationDetailView({ evaluation, isCurrent }: { evaluation: Evaluatio
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <span className="text-xs text-slate-500">Kỳ đánh giá</span>
-            <div className="text-base font-bold text-ink">{evaluation.period}</div>
+            <div className="text-base font-bold text-ink">{evaluation.period} · {evaluation.procurementField || 'Bộ tiêu chí cũ'}</div>
           </div>
           <div>
             <span className="text-xs text-slate-500">Người đánh giá</span>
@@ -448,7 +448,7 @@ function EvaluationDetailView({ evaluation, isCurrent }: { evaluation: Evaluatio
                                     <td className="px-4 py-2 font-medium text-slate-800">
                                       {item.criterion ? `${item.criterion.code}. ${item.criterion.name}` : 'Tiêu chí'}
                                     </td>
-                                    <td className="px-4 py-2 text-center font-semibold text-ink">{item.score}</td>
+                                    <td className="px-4 py-2 text-center font-semibold text-ink">{item.score === null ? 'N/A' : item.score}</td>
                                     <td className="px-4 py-2 text-right font-bold text-accent">
                                       {formatScore(item.normalizedScore)}
                                     </td>
