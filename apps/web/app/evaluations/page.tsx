@@ -15,11 +15,15 @@ const applies = (c: Criterion, field: string, types: string[]) =>
   (!c.applicableFields?.length || c.applicableFields.includes(field)) &&
   (!c.applicableType || types.some(t => c.applicableType!.split(',').map(s => s.trim()).includes(t)));
 const blankContract = (): Contract => ({ code: '', name: '', evaluator: '', procurementType: 'Hàng hóa', answers: {} });
+const HISTORY_PAGE_SIZE = 10;
+type EvaluationPage = { items: Evaluation[]; total: number; page: number; limit: number; totalPages: number };
 
 export default function EvaluationsPage() {
   const [config, setConfig] = useState<EvaluationConfig>();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [history, setHistory] = useState<Evaluation[]>([]);
+  const [historyPagination, setHistoryPagination] = useState<Omit<EvaluationPage, 'items'>>({ total: 0, page: 1, limit: HISTORY_PAGE_SIZE, totalPages: 1 });
+  const [historyLoading, setHistoryLoading] = useState(false);
   const [supplierId, setSupplierId] = useState('');
   const [period, setPeriod] = useState('2026');
   const [field, setField] = useState('');
@@ -32,18 +36,34 @@ export default function EvaluationsPage() {
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
 
+  async function loadHistory(nextSupplierId = supplierId, nextPage = 1) {
+    setHistoryLoading(true);
+    try {
+      const params = new URLSearchParams({ page: String(nextPage), limit: String(HISTORY_PAGE_SIZE) });
+      if (nextSupplierId) params.set('supplierId', nextSupplierId);
+      const data = await apiFetch<EvaluationPage>(`/evaluations?${params.toString()}`);
+      setHistory(data.items);
+      setHistoryPagination({ total: data.total, page: data.page, limit: data.limit, totalPages: data.totalPages });
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setHistoryLoading(false);
+    }
+  }
+
   useEffect(() => {
     let cancelled = false;
     async function load() {
       const [schema, first, evaluations] = await Promise.all([
         apiFetch<EvaluationConfig>('/evaluation-configs/default/form-schema'),
         apiFetch<{ items: Supplier[]; totalPages: number }>('/suppliers?limit=100'),
-        apiFetch<Evaluation[]>('/evaluations'),
+        apiFetch<EvaluationPage>(`/evaluations?page=1&limit=${HISTORY_PAGE_SIZE}`),
       ]);
       const all = [...first.items];
       for (let page = 2; page <= first.totalPages; page++) all.push(...(await apiFetch<{ items: Supplier[] }>(`/suppliers?limit=100&page=${page}`)).items);
       if (cancelled) return;
-      setConfig(schema); setPeriod(schema.evaluationPeriod); setSuppliers(all); setHistory(evaluations);
+      setConfig(schema); setPeriod(schema.evaluationPeriod); setSuppliers(all); setHistory(evaluations.items);
+      setHistoryPagination({ total: evaluations.total, page: evaluations.page, limit: evaluations.limit, totalPages: evaluations.totalPages });
     }
     load().catch(e => { if (!cancelled) setError(e.message); });
     return () => { cancelled = true; };
@@ -72,7 +92,7 @@ export default function EvaluationsPage() {
       const body = JSON.stringify(payload());
       if (save) {
         const saved = await apiFetch<Evaluation>('/evaluations', { method: 'POST', body });
-        setHistory(current => [saved, ...current]); setDetail(saved);
+        await loadHistory(supplierId, 1); setDetail(saved);
         localStorage.removeItem(draftKey);
         setMessage(`Đã lưu phiếu năm ${period} · ${field}: ${formatScore(saved.totalScore)} điểm, loại ${saved.rankCode}`);
       } else setPreview(await apiFetch<Preview>('/evaluations/preview', { method: 'POST', body }));
@@ -132,7 +152,7 @@ export default function EvaluationsPage() {
     {!config.weightsConfirmed && <div className="rounded border border-amber-300 bg-amber-50 p-4 text-sm">Trọng số chưa được xác nhận. <Link className="font-semibold underline" href="/admin">Cấu hình trọng số trên trang quản trị</Link> trước khi hoàn thành phiếu. Bạn vẫn có thể nhập nháp và tính thử.</div>}
     {error && <ErrorState message={error} />}{message && <p role="status" className="rounded bg-emerald-50 p-4 text-emerald-800">{message}</p>}
     <section className="grid gap-4 rounded border border-line bg-white p-4 md:grid-cols-2">
-      <label className="text-sm">Nhà cung cấp<select className={input} value={supplierId} onChange={e => { setSupplierId(e.target.value); setAnswers({}); setContracts([blankContract()]); invalidate(); }}><option value="">Chọn nhà cung cấp</option>{suppliers.map(s => <option key={s.id} value={s.id}>{s.code} · {s.name}</option>)}</select></label>
+      <label className="text-sm">Nhà cung cấp<select className={input} value={supplierId} onChange={e => { const nextSupplierId = e.target.value; setSupplierId(nextSupplierId); setAnswers({}); setContracts([blankContract()]); invalidate(); void loadHistory(nextSupplierId, 1); }}><option value="">Chọn nhà cung cấp</option>{suppliers.map(s => <option key={s.id} value={s.id}>{s.code} · {s.name}</option>)}</select></label>
       <label className="text-sm">Năm đánh giá<input className={input} value={period} maxLength={4} onChange={e => { setPeriod(e.target.value); setAnswers({}); setContracts([blankContract()]); invalidate(); }} /></label>
       <label className="text-sm">Lĩnh vực mua sắm<select className={input} value={field} onChange={e => { setField(e.target.value); setAnswers({}); setContracts([blankContract()]); invalidate(); }}><option value="">Chọn lĩnh vực trước khi chấm</option>{config.procurementFields?.map(f => <option key={f}>{f}</option>)}</select></label>
       <label className="text-sm">Đầu mối đánh giá nhà cung cấp<input className={input} value={evaluator} onChange={e => { setEvaluator(e.target.value); invalidate(); }} /></label>
@@ -155,7 +175,8 @@ export default function EvaluationsPage() {
       </section>
     </>}
     <section className="space-y-3"><h2 className="text-lg font-semibold">Lịch sử đánh giá {supplierId ? 'nhà cung cấp đang chọn' : ''}</h2>
-      {history.filter(e => !supplierId || e.supplierId === supplierId).map(e => <button key={e.id} onClick={() => view(e.id)} className="flex w-full flex-wrap justify-between gap-2 rounded border border-line bg-white p-3 text-left text-sm"><span>{e.supplier?.name} · {e.period} · {e.procurementField || 'Bộ tiêu chí cũ'}</span><strong>{formatScore(e.totalScore)} · {e.rankCode}</strong></button>)}
+      {historyLoading ? <p className="text-sm text-slate-500">Đang tải lịch sử đánh giá...</p> : history.length === 0 ? <p className="rounded border border-dashed border-line p-3 text-sm text-slate-500">Chưa có phiếu đánh giá.</p> : history.map(e => <button key={e.id} onClick={() => view(e.id)} className="flex w-full flex-wrap justify-between gap-2 rounded border border-line bg-white p-3 text-left text-sm"><span>{e.supplier?.name} · {e.period} · {e.procurementField || 'Bộ tiêu chí cũ'}</span><strong>{formatScore(e.totalScore)} · {e.rankCode}</strong></button>)}
+      {historyPagination.total > 0 && <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3 text-sm"><span className="text-slate-600">Hiển thị {(historyPagination.page - 1) * historyPagination.limit + 1}–{Math.min(historyPagination.page * historyPagination.limit, historyPagination.total)} / {historyPagination.total} phiếu</span><div className="flex items-center gap-2"><button type="button" disabled={historyPagination.page <= 1 || historyLoading} onClick={() => void loadHistory(supplierId, historyPagination.page - 1)} className="rounded border border-line px-3 py-1.5 disabled:cursor-not-allowed disabled:opacity-40">Trước</button><span>Trang {historyPagination.page}/{historyPagination.totalPages}</span><button type="button" disabled={historyPagination.page >= historyPagination.totalPages || historyLoading} onClick={() => void loadHistory(supplierId, historyPagination.page + 1)} className="rounded border border-line px-3 py-1.5 disabled:cursor-not-allowed disabled:opacity-40">Sau</button></div></div>}
     </section>
     {detail && <section className="space-y-3 rounded border border-teal-200 bg-white p-4"><button className="float-right" onClick={() => setDetail(undefined)}>Đóng</button><h2 className="font-semibold">Phiếu {detail.period} · {detail.procurementField || 'Lịch sử'}</h2><p>{detail.evaluator} · {formatScore(detail.totalScore)} điểm · {detail.rankName}</p><p className="text-xs">{detail.configSnapshot?.name || 'Cấu hình lịch sử'} · {new Date(detail.createdAt).toLocaleString('vi-VN')}</p>
       {(detail.items ?? []).map(item => <p key={item.id || item.criterionId} className="text-sm">{item.criterion?.code || detail.configSnapshot?.groups.flatMap(g => g.criteria).find(c => c.id === item.criterionId)?.code}: {item.score === null ? 'N/A' : item.score} · {item.note}</p>)}

@@ -24,13 +24,18 @@ export class EvaluationsService {
     private readonly scoring: ScoringService,
   ) {}
 
-  findAll(supplierId?: string) {
-    return this.evaluations.find({
-      where: supplierId ? { supplierId } : {},
+  async findAll(filters: { supplierId?: string; page?: number; limit?: number }) {
+    const page = Math.max(1, filters.page ?? 1);
+    const limit = Math.min(100, Math.max(1, filters.limit ?? 10));
+    const [items, total] = await this.evaluations.findAndCount({
+      where: filters.supplierId ? { supplierId: filters.supplierId } : {},
       // Only load supplier name for list view; avoid loading all items/criteria (very slow)
       relations: { supplier: true },
       order: { createdAt: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
     });
+    return { items, total, page, limit, totalPages: Math.max(1, Math.ceil(total / limit)) };
   }
 
   async findOne(id: string) {

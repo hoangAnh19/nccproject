@@ -7,8 +7,16 @@ export class EvaluationsController {
   constructor(private readonly evaluationsService: EvaluationsService) {}
 
   @Get()
-  findAll(@Query('supplierId') supplierId?: string) {
-    return this.evaluationsService.findAll(supplierId);
+  findAll(
+    @Query('supplierId') supplierId?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.evaluationsService.findAll({
+      supplierId,
+      page: page ? parseInt(page, 10) : undefined,
+      limit: limit ? parseInt(limit, 10) : undefined,
+    });
   }
 
   @Get(':id')

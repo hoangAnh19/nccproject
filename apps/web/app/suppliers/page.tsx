@@ -1,6 +1,7 @@
 'use client';
 
-import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
 import {
   ArrowDown,
   ArrowUp,
@@ -22,18 +23,6 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/state';
 import { SupplierDetailModal } from '@/components/supplier-detail-modal';
 
 const PAGE_SIZES = [10, 20, 50];
-
-const emptyForm = {
-  code: '',
-  name: '',
-  taxCode: '',
-  type: 'Phần mềm',
-  contactName: '',
-  email: '',
-  phone: '',
-  address: '',
-  note: '',
-};
 
 type PaginatedResponse = {
   items: Supplier[];
@@ -64,11 +53,9 @@ export default function SuppliersPage() {
   const [highlightId, setHighlightId] = useState<string | null>(null);
   const [detailSupplierId, setDetailSupplierId] = useState<string | null>(null);
 
-  const [form, setForm] = useState(emptyForm);
-  const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const didLoadInitialState = useRef(false);
 
   const load = useCallback(
     (customParams?: {
@@ -125,6 +112,10 @@ export default function SuppliersPage() {
   }, []);
 
   useEffect(() => {
+    // `load` changes when a filter changes. Only hydrate filters from the URL once,
+    // otherwise every keystroke in the search box is overwritten by the old URL value.
+    if (didLoadInitialState.current) return;
+    didLoadInitialState.current = true;
     const params = new URLSearchParams(window.location.search);
     const initialSearch = params.get('search') ?? '';
     const initialType = params.get('type') ?? '';
@@ -227,40 +218,6 @@ export default function SuppliersPage() {
 
   const isFiltered = Boolean(search || type || rank || status || sortBy !== 'createdAt' || sortOrder !== 'DESC');
 
-  const submitForm = async (event: FormEvent) => {
-    event.preventDefault();
-    setSaving(true);
-    setError('');
-    try {
-      await apiFetch<Supplier>(editingId ? `/suppliers/${editingId}` : '/suppliers', {
-        method: editingId ? 'PATCH' : 'POST',
-        body: JSON.stringify(form),
-      });
-      setForm(emptyForm);
-      setEditingId(null);
-      load();
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const edit = (supplier: Supplier) => {
-    setEditingId(supplier.id);
-    setForm({
-      code: supplier.code,
-      name: supplier.name,
-      taxCode: supplier.taxCode,
-      type: supplier.type,
-      contactName: supplier.contactName ?? '',
-      email: supplier.email ?? '',
-      phone: supplier.phone ?? '',
-      address: supplier.address ?? '',
-      note: supplier.note ?? '',
-    });
-  };
-
   const remove = async (supplier: Supplier) => {
     if (!confirm(`Xóa nhà cung cấp ${supplier.name}?`)) return;
     await apiFetch(`/suppliers/${supplier.id}`, { method: 'DELETE' });
@@ -276,13 +233,22 @@ export default function SuppliersPage() {
             Tìm kiếm, lọc, sắp xếp, xem chi tiết điểm đánh giá và cập nhật hồ sơ nhà cung cấp CNTT.
           </p>
         </div>
-        <button
-          onClick={() => load()}
-          className="focus-ring flex items-center gap-2 rounded-md border border-line bg-white px-3 py-2 text-sm hover:bg-slate-50 transition"
-        >
-          <RefreshCw size={16} />
-          Tải lại
-        </button>
+        <div className="flex shrink-0 gap-2">
+          <button
+            onClick={() => load()}
+            className="focus-ring flex items-center gap-2 rounded-md border border-line bg-white px-3 py-2 text-sm hover:bg-slate-50 transition"
+          >
+            <RefreshCw size={16} />
+            Tải lại
+          </button>
+          <Link
+            href="/suppliers/new"
+            className="focus-ring flex items-center gap-2 rounded-md bg-accent px-3 py-2 text-sm font-semibold text-white hover:opacity-90 transition"
+          >
+            <Plus size={16} />
+            Thêm nhà cung cấp
+          </Link>
+        </div>
       </header>
 
       {error && <ErrorState message={error} />}
@@ -294,58 +260,6 @@ export default function SuppliersPage() {
           onClose={() => setDetailSupplierId(null)}
         />
       )}
-
-      {/* Accordion/Card for Form */}
-      <section className="rounded-md border border-line bg-white p-4">
-        <h2 className="mb-3 text-sm font-semibold text-ink">
-          {editingId ? 'Chỉnh sửa nhà cung cấp' : 'Thêm nhà cung cấp mới'}
-        </h2>
-        <form onSubmit={submitForm} className="grid gap-3 lg:grid-cols-4">
-          <Input label="Mã NCC" value={form.code} onChange={(value) => setForm({ ...form, code: value })} required />
-          <Input
-            label="Tên nhà cung cấp"
-            value={form.name}
-            onChange={(value) => setForm({ ...form, name: value })}
-            required
-          />
-          <Input
-            label="Mã số thuế"
-            value={form.taxCode}
-            onChange={(value) => setForm({ ...form, taxCode: value })}
-            required
-          />
-          <Input label="Loại hình" value={form.type} onChange={(value) => setForm({ ...form, type: value })} required />
-          <Input
-            label="Người liên hệ"
-            value={form.contactName}
-            onChange={(value) => setForm({ ...form, contactName: value })}
-          />
-          <Input label="Email" value={form.email} onChange={(value) => setForm({ ...form, email: value })} />
-          <Input label="Điện thoại" value={form.phone} onChange={(value) => setForm({ ...form, phone: value })} />
-          <Input label="Địa chỉ" value={form.address} onChange={(value) => setForm({ ...form, address: value })} />
-          <div className="flex gap-2 lg:col-span-4">
-            <button
-              disabled={saving}
-              className="focus-ring flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white disabled:opacity-60 hover:opacity-90 transition"
-            >
-              <Plus size={16} />
-              {editingId ? 'Lưu thay đổi' : 'Thêm nhà cung cấp'}
-            </button>
-            {editingId && (
-              <button
-                type="button"
-                onClick={() => {
-                  setEditingId(null);
-                  setForm(emptyForm);
-                }}
-                className="rounded-md border border-line px-4 py-2 text-sm hover:bg-slate-50"
-              >
-                Hủy
-              </button>
-            )}
-          </div>
-        </form>
-      </section>
 
       {/* Filter and Sort Toolbar */}
       <section className="rounded-md border border-line bg-white p-4 space-y-3">
@@ -586,7 +500,7 @@ export default function SuppliersPage() {
                         <Eye size={16} />
                       </button>
                       <button
-                        onClick={() => edit(supplier)}
+                        onClick={() => { window.location.href = `/suppliers/new?edit=${supplier.id}`; }}
                         title="Chỉnh sửa thông tin"
                         className="focus-ring inline-flex rounded-md border border-line bg-white p-2 text-blue-600 hover:bg-blue-50 transition"
                       >
@@ -673,7 +587,6 @@ export default function SuppliersPage() {
     </div>
   );
 }
-
 function SortIcon({
   field,
   currentSortBy,
@@ -690,29 +603,5 @@ function SortIcon({
     <ArrowUp size={14} className="text-accent font-bold" />
   ) : (
     <ArrowDown size={14} className="text-accent font-bold" />
-  );
-}
-
-function Input({
-  label,
-  value,
-  onChange,
-  required,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  required?: boolean;
-}) {
-  return (
-    <label className="block text-sm">
-      <span className="mb-1 block text-xs font-medium text-slate-600">{label}</span>
-      <input
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        required={required}
-        className="focus-ring w-full rounded-md border border-line px-3 py-2 text-sm"
-      />
-    </label>
   );
 }
