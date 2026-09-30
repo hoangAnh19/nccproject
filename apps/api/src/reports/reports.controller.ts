@@ -11,8 +11,13 @@ export class ReportsController {
   }
 
   @Get('annual')
-  annual(@Query('field') field?: string, @Query('period') period?: string) {
-    return this.reportsService.annual(field, period);
+  annual(@Query('field') field?: string, @Query('period') period?: string, @Query('year') year?: string) {
+    return this.reportsService.annual(field, period, year);
+  }
+
+  @Get('period-options')
+  periodOptions() {
+    return this.reportsService.periodOptions();
   }
 
   @Get('rank-distribution')

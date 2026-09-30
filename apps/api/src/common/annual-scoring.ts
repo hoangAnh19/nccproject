@@ -43,8 +43,7 @@ export function calculateAnnual(config: EvaluationConfig, items: SubmittedScore[
       const item = map.get(criterion.id) ?? fail(`Chưa đánh giá ${criterion.code}`);
       if (item.score === null) {
         if (!item.note?.trim()) fail(`N/A tại ${criterion.code} cần lý do`);
-      } else if (!Number.isInteger(item.score) || item.score < config.scaleMin || item.score > config.scaleMax ||
-        (criterion.allowedScores?.length && !criterion.allowedScores.includes(item.score))) {
+      } else if (!Number.isInteger(item.score) || item.score < config.scaleMin || item.score > config.scaleMax) {
         fail(`Điểm ${criterion.code} không đúng thang điểm của tiêu chí`);
       }
     }

@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { apiFetch, formatScore } from '@/lib/api';
+import { currentEvaluationPeriod } from '@/lib/evaluation-period';
 import type { Criterion, Evaluation, EvaluationConfig, Supplier } from '@/lib/types';
 import { ErrorState, LoadingState } from '@/components/state';
 
@@ -25,7 +25,8 @@ export default function EvaluationsPage() {
   const [historyPagination, setHistoryPagination] = useState<Omit<EvaluationPage, 'items'>>({ total: 0, page: 1, limit: HISTORY_PAGE_SIZE, totalPages: 1 });
   const [historyLoading, setHistoryLoading] = useState(false);
   const [supplierId, setSupplierId] = useState('');
-  const [period, setPeriod] = useState('2026');
+  const [year, setYear] = useState(currentEvaluationPeriod().slice(0, 4));
+  const [quarter, setQuarter] = useState(currentEvaluationPeriod().slice(-2));
   const [field, setField] = useState('');
   const [evaluator, setEvaluator] = useState('');
   const [answers, setAnswers] = useState<Answers>({});
@@ -35,6 +36,9 @@ export default function EvaluationsPage() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
+  const period = `${year}-${quarter}`;
+  const years = Array.from({ length: 4 }, (_, index) => String(new Date().getFullYear() + 1 - index));
+  const resetForPeriod = () => { setAnswers({}); setContracts([blankContract()]); invalidate(); };
 
   async function loadHistory(nextSupplierId = supplierId, nextPage = 1) {
     setHistoryLoading(true);
@@ -62,7 +66,7 @@ export default function EvaluationsPage() {
       const all = [...first.items];
       for (let page = 2; page <= first.totalPages; page++) all.push(...(await apiFetch<{ items: Supplier[] }>(`/suppliers?limit=100&page=${page}`)).items);
       if (cancelled) return;
-      setConfig(schema); setPeriod(schema.evaluationPeriod); setSuppliers(all); setHistory(evaluations.items);
+      setConfig(schema); setSuppliers(all); setHistory(evaluations.items);
       setHistoryPagination({ total: evaluations.total, page: evaluations.page, limit: evaluations.limit, totalPages: evaluations.totalPages });
     }
     load().catch(e => { if (!cancelled) setError(e.message); });
@@ -94,7 +98,7 @@ export default function EvaluationsPage() {
         const saved = await apiFetch<Evaluation>('/evaluations', { method: 'POST', body });
         await loadHistory(supplierId, 1); setDetail(saved);
         localStorage.removeItem(draftKey);
-        setMessage(`Đã lưu phiếu năm ${period} · ${field}: ${formatScore(saved.totalScore)} điểm, loại ${saved.rankCode}`);
+        setMessage(`Đã lưu phiếu kỳ ${period} · ${field}: ${formatScore(saved.totalScore)} điểm, loại ${saved.rankCode}`);
       } else setPreview(await apiFetch<Preview>('/evaluations/preview', { method: 'POST', body }));
     } catch (e) { setError((e as Error).message); }
     finally { setBusy(false); }
@@ -103,7 +107,7 @@ export default function EvaluationsPage() {
     try {
       if (restore) {
         const raw = localStorage.getItem(draftKey);
-        if (!raw) throw new Error('Không có bản nháp cho nhà cung cấp, năm và lĩnh vực đang chọn');
+        if (!raw) throw new Error('Không có bản nháp cho nhà cung cấp, kỳ và lĩnh vực đang chọn');
         const saved = JSON.parse(raw);
         setEvaluator(saved.evaluator); setAnswers(saved.answers); setContracts(saved.contracts); invalidate();
         setMessage('Đã khôi phục bản nháp');
@@ -129,7 +133,7 @@ export default function EvaluationsPage() {
             <label className="text-xs">Điểm / Không áp dụng
               <select aria-label={`Điểm ${c.code}`} className={input} value={values[c.id]?.score === null ? 'NA' : values[c.id]?.score ?? ''} onChange={e => { invalidate(); update({ ...values, [c.id]: { note: values[c.id]?.note ?? '', score: e.target.value === 'NA' ? null : e.target.value === '' ? '' : Number(e.target.value) } }); }}>
                 <option value="">Chưa đánh giá</option>
-                {(c.allowedScores ?? config!.scoreOptions.map(o => o.value)).map(score => <option key={score} value={score}>{score} điểm</option>)}
+                {config!.scoreOptions.map(option => <option key={option.id} value={option.value}>{option.value} điểm{option.label ? ` · ${option.label}` : ''}</option>)}
                 <option value="NA">N/A · Không phát sinh/áp dụng</option>
               </select>
             </label>
@@ -148,17 +152,16 @@ export default function EvaluationsPage() {
   }
 
   return <div className="space-y-6">
-    <header><h1 className="text-2xl font-bold">Đánh giá nhà cung cấp theo năm</h1><p className="mt-1 text-sm text-slate-600">{config.name} · Xếp hạng theo từng lĩnh vực</p></header>
-    {!config.weightsConfirmed && <div className="rounded border border-amber-300 bg-amber-50 p-4 text-sm">Trọng số chưa được xác nhận. <Link className="font-semibold underline" href="/admin">Cấu hình trọng số trên trang quản trị</Link> trước khi hoàn thành phiếu. Bạn vẫn có thể nhập nháp và tính thử.</div>}
+    <header><h1 className="text-2xl font-bold">Đánh giá nhà cung cấp theo kỳ</h1><p className="mt-1 text-sm text-slate-600">{config.name} · Xếp hạng theo từng lĩnh vực</p></header>
     {error && <ErrorState message={error} />}{message && <p role="status" className="rounded bg-emerald-50 p-4 text-emerald-800">{message}</p>}
     <section className="grid gap-4 rounded border border-line bg-white p-4 md:grid-cols-2">
       <label className="text-sm">Nhà cung cấp<select className={input} value={supplierId} onChange={e => { const nextSupplierId = e.target.value; setSupplierId(nextSupplierId); setAnswers({}); setContracts([blankContract()]); invalidate(); void loadHistory(nextSupplierId, 1); }}><option value="">Chọn nhà cung cấp</option>{suppliers.map(s => <option key={s.id} value={s.id}>{s.code} · {s.name}</option>)}</select></label>
-      <label className="text-sm">Năm đánh giá<input className={input} value={period} maxLength={4} onChange={e => { setPeriod(e.target.value); setAnswers({}); setContracts([blankContract()]); invalidate(); }} /></label>
+      <div className="grid gap-4 sm:grid-cols-2"><label className="text-sm">Năm đánh giá<select className={input} value={year} onChange={e => { setYear(e.target.value); resetForPeriod(); }}>{years.map(value => <option key={value}>{value}</option>)}</select></label><label className="text-sm">Quý đánh giá<select className={input} value={quarter} onChange={e => { setQuarter(e.target.value); resetForPeriod(); }}>{['Q1', 'Q2', 'Q3', 'Q4'].map(value => <option key={value}>{value}</option>)}</select></label></div>
       <label className="text-sm">Lĩnh vực mua sắm<select className={input} value={field} onChange={e => { setField(e.target.value); setAnswers({}); setContracts([blankContract()]); invalidate(); }}><option value="">Chọn lĩnh vực trước khi chấm</option>{config.procurementFields?.map(f => <option key={f}>{f}</option>)}</select></label>
       <label className="text-sm">Đầu mối đánh giá nhà cung cấp<input className={input} value={evaluator} onChange={e => { setEvaluator(e.target.value); invalidate(); }} /></label>
     </section>
     {supplierId && field && <>
-      <section className="space-y-3"><h2 className="text-lg font-semibold">1. Hợp đồng thuộc lĩnh vực {field} trong năm {period}</h2><p className="text-sm text-slate-600">Khai báo đủ hợp đồng để xác định loại hình áp dụng. C được tính bình quân điểm các hợp đồng, không theo giá trị hợp đồng.</p>
+      <section className="space-y-3"><h2 className="text-lg font-semibold">1. Hợp đồng thuộc lĩnh vực {field} trong kỳ {period}</h2><p className="text-sm text-slate-600">Khai báo đủ hợp đồng để xác định loại hình áp dụng. C được tính bình quân điểm các hợp đồng, không theo giá trị hợp đồng.</p>
         {contracts.map((contract, index) => <div key={index} className="grid gap-3 rounded border border-line bg-white p-4 md:grid-cols-2 xl:grid-cols-5">
           {(['code', 'name', 'evaluator'] as const).map((key, i) => <label key={key} className="text-xs">{['Mã hợp đồng', 'Tên hợp đồng', 'Đơn vị/người đánh giá hợp đồng'][i]}<input className={input} value={contract[key]} onChange={e => { setContracts(contracts.map((c,j) => j === index ? { ...c, [key]: e.target.value } : c)); invalidate(); }} /></label>)}
           <label className="text-xs">Loại hình<select className={input} value={contract.procurementType} onChange={e => { setContracts(contracts.map((c,j) => j === index ? { ...c, procurementType: e.target.value, answers: {} } : c)); invalidate(); }}>{['Hàng hóa','TV','PTV'].map(t => <option key={t}>{t}</option>)}</select></label>
@@ -166,12 +169,12 @@ export default function EvaluationsPage() {
         </div>)}
         <button className="rounded border border-line bg-white px-4 py-2" onClick={() => { setContracts([...contracts, blankContract()]); invalidate(); }}>+ Thêm hợp đồng</button>
       </section>
-      <section className="space-y-3"><h2 className="text-lg font-semibold">2. Hồ sơ nhà cung cấp · A, B và ESG nhà cung cấp</h2><p className="text-sm text-slate-600">Đầu mối nhập một lần trong phiếu năm, dùng chung cho các hợp đồng trong lĩnh vực này.</p>{renderCriteria(supplierCriteria, answers, setAnswers)}</section>
+      <section className="space-y-3"><h2 className="text-lg font-semibold">2. Hồ sơ nhà cung cấp · A, B và ESG nhà cung cấp</h2><p className="text-sm text-slate-600">Đầu mối nhập một lần trong phiếu kỳ, dùng chung cho các hợp đồng trong lĩnh vực này.</p>{renderCriteria(supplierCriteria, answers, setAnswers)}</section>
       <section className="space-y-4"><h2 className="text-lg font-semibold">3. Đánh giá từng hợp đồng · C và ESG sản phẩm/dịch vụ</h2>{contracts.map((c,index) => <details key={index} open className="space-y-3 rounded-lg border-2 border-teal-100 p-4"><summary className="cursor-pointer text-lg font-semibold">{c.code || `Hợp đồng ${index+1}`} · {c.name} · {c.procurementType}</summary>{renderCriteria(contractCriteria(c), c.answers, next => setContracts(contracts.map((contract,j) => j === index ? { ...contract, answers: next } : contract)))}</details>)}</section>
       <section className="sticky bottom-0 space-y-3 rounded border border-line bg-white p-4 shadow-lg">
         <p className="text-sm">0 là điểm không đáp ứng; N/A loại khỏi mẫu số và cần lý do. Không tự chấm điểm cho ô chưa nhập.</p>
         {preview && <div className="rounded bg-teal-50 p-3"><p className="text-xl font-bold">{formatScore(preview.totalScore)} / 100 · {preview.rank.code} – {preview.rank.name}</p><p className="text-sm">{preview.groupScores.map(g => `${g.code}: ${formatScore(g.score)} × ${formatScore(g.weight)}%`).join(' · ')}</p><p className="text-xs">{preview.calculationDetails?.explanation}</p></div>}
-        <div className="flex flex-wrap gap-3"><button disabled={busy} onClick={() => calculate(false)} className="rounded border px-4 py-2">Tính thử</button><button disabled={busy || !config.weightsConfirmed} onClick={() => calculate(true)} className="rounded bg-teal-700 px-4 py-2 font-semibold text-white disabled:opacity-40">{busy ? 'Đang xử lý…' : 'Hoàn thành phiếu năm'}</button><button onClick={() => draft(false)} className="rounded border px-4 py-2">Lưu nháp</button><button onClick={() => draft(true)} className="rounded border px-4 py-2">Khôi phục nháp</button></div>
+        <div className="flex flex-wrap gap-3"><button disabled={busy} onClick={() => calculate(false)} className="rounded border px-4 py-2">Tính thử</button><button disabled={busy} onClick={() => calculate(true)} className="rounded bg-teal-700 px-4 py-2 font-semibold text-white disabled:opacity-40">{busy ? 'Đang xử lý…' : 'Hoàn thành phiếu kỳ'}</button><button onClick={() => draft(false)} className="rounded border px-4 py-2">Lưu nháp</button><button onClick={() => draft(true)} className="rounded border px-4 py-2">Khôi phục nháp</button></div>
       </section>
     </>}
     <section className="space-y-3"><h2 className="text-lg font-semibold">Lịch sử đánh giá {supplierId ? 'nhà cung cấp đang chọn' : ''}</h2>

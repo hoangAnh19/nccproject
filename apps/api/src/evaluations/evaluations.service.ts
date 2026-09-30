@@ -56,8 +56,7 @@ export class EvaluationsService {
       : await this.configService.getDefault();
     if (!config) throw new NotFoundException('Không tìm thấy cấu hình đánh giá');
     if (!config.isActive) throw new BadRequestException('Bộ tiêu chí đã ngừng áp dụng');
-    if (config.scoringMethod === 'layered' && !config.weightsConfirmed) throw new BadRequestException('Cần xác nhận trọng số trên trang quản trị trước khi chấm chính thức');
-    if (config.scoringMethod === 'layered' && !/^\d{4}$/.test(dto.period)) throw new BadRequestException('Kỳ đánh giá phải là năm gồm 4 chữ số');
+    if (config.scoringMethod === 'layered' && !/^\d{4}-Q[1-4]$/.test(dto.period)) throw new BadRequestException('Kỳ đánh giá phải theo định dạng YYYY-Qn, ví dụ 2026-Q3');
 
     this.configService.sortConfig(config);
     const result = this.scoring.calculate(config, dto.items, { procurementField: dto.procurementField ?? '', contracts: dto.contracts ?? [] });

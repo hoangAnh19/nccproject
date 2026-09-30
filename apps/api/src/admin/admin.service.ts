@@ -29,11 +29,13 @@ export class AdminService {
     private readonly configService: EvaluationConfigsService,
   ) {}
 
-  findAll() {
-    return this.configs.find({
+  async findAll() {
+    const configs = await this.configs.find({
       relations: configRelations,
       order: { isDefault: 'DESC', createdAt: 'DESC' },
     });
+    configs.forEach((config) => this.configService.sortConfig(config));
+    return configs;
   }
 
   async findOne(id: string) {

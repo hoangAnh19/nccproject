@@ -67,13 +67,31 @@ export class ReportsService {
     });
   }
 
-  async annual(field?: string, period?: string) {
+  async annual(field?: string, period?: string, year?: string) {
     const evaluations = await this.evaluations.find({
-      where: { procurementField: field || Not(IsNull()), ...(period ? { period } : {}) },
+      // Historical imported evaluations have no procurement field. Keep them visible
+      // when a field is selected until the source data is classified.
+      where: field ? [{ procurementField: field }, { procurementField: IsNull() }] : {},
       relations: { supplier: true }, order: { createdAt: 'DESC' },
     });
-    const items = latestEvaluations(evaluations).sort((a,b) => b.totalScore-a.totalScore);
+    const selected = evaluations.filter((evaluation) => {
+      if (period) return evaluation.period === period;
+      return !year || evaluation.period === year || evaluation.period.startsWith(`${year}-`);
+    });
+    // For a yearly view, each supplier appears once with its newest result in that year.
+    const items = (year && !period ? latestBySupplier(selected) : latestEvaluations(selected)).sort((a,b) => b.totalScore-a.totalScore);
     return { items, count: items.length, averageScore: items.length ? Math.round(items.reduce((s,e) => s+e.totalScore,0)/items.length*100)/100 : null };
+  }
+
+  async periodOptions() {
+    const rows = await this.evaluations
+      .createQueryBuilder('evaluation')
+      .select('DISTINCT evaluation.period', 'period')
+      .orderBy('evaluation.period', 'DESC')
+      .getRawMany<{ period: string }>();
+    const periods = rows.map((row) => row.period).filter(Boolean);
+    const years = [...new Set(periods.map((period) => period.match(/^\d{4}/)?.[0]).filter((year): year is string => Boolean(year)))];
+    return { years, periods };
   }
 
   private scoreTrend(evaluations: Evaluation[]) {
@@ -90,4 +108,13 @@ export class ReportsService {
       averageScore: Math.round((item.total / item.count) * 100) / 100,
     }));
   }
+}
+
+function latestBySupplier(evaluations: Evaluation[]) {
+  const latest = new Map<string, Evaluation>();
+  for (const evaluation of [...evaluations].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime() || b.id.localeCompare(a.id))) {
+    const key = JSON.stringify([evaluation.supplierId, evaluation.procurementField ?? 'legacy']);
+    if (!latest.has(key)) latest.set(key, evaluation);
+  }
+  return [...latest.values()];
 }
