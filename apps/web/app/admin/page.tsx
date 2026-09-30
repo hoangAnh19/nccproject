@@ -379,7 +379,7 @@ export default function AdminPage() {
           <h2 className="mb-3 font-semibold">Thang điểm</h2>
           <div className="space-y-2">
             {draft.scoreOptions.map((option, index) => (
-              <div key={option.id ?? option.value} className="grid grid-cols-[80px_1fr_80px] gap-2">
+              <div key={option.id ?? option.value} className="grid gap-2 sm:grid-cols-[80px_1fr_80px]">
                 <NumberInput label="Điểm" value={option.value} onChange={(value) => updateScoreOption(index, { value })} />
                 <Input label="Nhãn" value={option.label} onChange={(value) => updateScoreOption(index, { label: value })} />
                 <label className="flex items-center gap-2 self-end pb-2 text-sm">
@@ -398,7 +398,7 @@ export default function AdminPage() {
           <h2 className="mb-3 font-semibold">Luật xếp hạng</h2>
           <div className="space-y-2">
             {draft.rankRules.map((rank, index) => (
-              <div key={rank.id ?? rank.code} className="grid grid-cols-[70px_1fr_90px_90px_90px] gap-2">
+              <div key={rank.id ?? rank.code} className="grid gap-2 sm:grid-cols-[70px_1fr_90px_90px_90px]">
                 <Input label="Mã" value={rank.code} onChange={(value) => updateRank(index, { code: value })} />
                 <Input label="Tên" value={rank.name} onChange={(value) => updateRank(index, { name: value })} />
                 <NumberInput label="Từ" value={rank.minScore} onChange={(value) => updateRank(index, { minScore: value })} />

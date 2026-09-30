@@ -42,20 +42,20 @@ export function SupplierDetailModal({ supplierId, onClose }: SupplierDetailModal
   const historyList = supplier?.evaluations ?? [];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4 backdrop-blur-xs animate-in fade-in duration-200">
       <div className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-lg bg-white shadow-xl border border-line">
         {/* Modal Header */}
-        <div className="flex items-center justify-between border-b border-line px-6 py-4 bg-slate-50">
+        <div className="flex items-start justify-between gap-3 border-b border-line bg-slate-50 px-4 py-3 sm:px-6 sm:py-4">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-bold text-ink">{supplier?.name || 'Chi tiết nhà cung cấp'}</h2>
+              <h2 className="text-lg font-bold text-ink sm:text-xl">{supplier?.name || 'Chi tiết nhà cung cấp'}</h2>
               {supplier?.type && (
                 <span className="rounded bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-700">
                   {supplier.type}
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="mt-0.5 break-words text-xs text-slate-500">
               Mã: <span className="font-medium text-slate-700">{supplier?.code}</span> | MST:{' '}
               <span className="font-medium text-slate-700">{supplier?.taxCode}</span>
               {supplier?.contactName && ` | Liên hệ: ${supplier.contactName}`}
@@ -84,7 +84,7 @@ export function SupplierDetailModal({ supplierId, onClose }: SupplierDetailModal
         ) : (
           <div className="flex flex-1 flex-col overflow-hidden">
             {/* Quick Metrics Bar */}
-            <div className="grid grid-cols-3 divide-x divide-line border-b border-line bg-white px-6 py-3 text-sm">
+            <div className="grid divide-y divide-line border-b border-line bg-white px-4 py-3 text-sm sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:px-6">
               <div className="flex items-center gap-3">
                 <Award className="text-accent" size={24} />
                 <div>

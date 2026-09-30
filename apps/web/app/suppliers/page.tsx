@@ -408,8 +408,8 @@ export default function SuppliersPage() {
       ) : suppliers.length === 0 ? (
         <EmptyState message="Không có nhà cung cấp nào phù hợp với bộ lọc" />
       ) : (
-        <section className="overflow-hidden rounded-md border border-line bg-white shadow-sm">
-          <table className="w-full text-left text-sm">
+        <section className="overflow-x-auto rounded-md border border-line bg-white shadow-sm">
+          <table className="min-w-[760px] w-full text-left text-sm">
             <thead className="bg-slate-50 text-xs uppercase text-slate-500 border-b border-line">
               <tr>
                 <th
