@@ -2,30 +2,25 @@
 -- bộ tiêu chí mặc định đang áp dụng. Các evaluation_items được xóa theo
 -- khóa ngoại ON DELETE CASCADE.
 --
--- Chạy bằng UTF-8:
+-- Có thể chạy toàn bộ script trong DBeaver/Workbench hoặc mysql CLI.
 -- docker compose exec -T mysql mysql --default-character-set=utf8mb4 -uncc_user -pncc_pass ncc_db < database/delete-evaluations-old-criteria.sql
 
 SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
-SET CHARACTER SET utf8mb4;
-
 START TRANSACTION;
 
--- Khóa bộ tiêu chí hiện hành để không vô tình xóa dữ liệu khi chưa có config mặc định.
-SET @current_config_id = NULL;
-SELECT id INTO @current_config_id
-FROM evaluation_configs
-WHERE isDefault = TRUE AND isActive = TRUE
-ORDER BY updatedAt DESC, createdAt DESC
-LIMIT 1;
+-- Câu lệnh chỉ tác động khi tồn tại một bộ tiêu chí mặc định đang bật.
+-- Không dùng session variable để tương thích khi thực thi từng câu lệnh trong SQL client.
+DELETE evaluation
+FROM evaluations AS evaluation
+JOIN evaluation_configs AS config ON config.id = evaluation.configId
+WHERE NOT (config.isDefault = TRUE AND config.isActive = TRUE)
+  AND EXISTS (
+    SELECT 1
+    FROM evaluation_configs AS active_config
+    WHERE active_config.isDefault = TRUE AND active_config.isActive = TRUE
+  );
 
--- Nếu không có config mặc định, các lệnh thay đổi bên dưới đều là no-op.
-SELECT @current_config_id AS current_config_id;
-
-DELETE FROM evaluations
-WHERE @current_config_id IS NOT NULL
-  AND configId <> @current_config_id;
-
--- Làm mới điểm/rank tổng hợp của NCC theo phiếu còn lại mới nhất.
+-- Làm mới điểm/rank tổng hợp của NCC theo các phiếu còn lại.
 UPDATE suppliers
 SET latestScore = NULL,
     latestRankCode = NULL,
@@ -33,15 +28,17 @@ SET latestScore = NULL,
     latestRankColor = NULL,
     lastEvaluatedAt = NULL,
     updatedAt = NOW()
-WHERE @current_config_id IS NOT NULL;
+WHERE EXISTS (
+  SELECT 1
+  FROM evaluation_configs AS active_config
+  WHERE active_config.isDefault = TRUE AND active_config.isActive = TRUE
+);
 
-UPDATE suppliers supplier
-JOIN evaluations evaluation
-  ON evaluation.supplierId = supplier.id
- AND evaluation.configId = @current_config_id
-LEFT JOIN evaluations newer
+-- Sau DELETE, chỉ còn phiếu thuộc config mặc định đang bật; lấy phiếu mới nhất của từng NCC.
+UPDATE suppliers AS supplier
+JOIN evaluations AS evaluation ON evaluation.supplierId = supplier.id
+LEFT JOIN evaluations AS newer
   ON newer.supplierId = evaluation.supplierId
- AND newer.configId = @current_config_id
  AND (newer.createdAt > evaluation.createdAt OR (newer.createdAt = evaluation.createdAt AND newer.id > evaluation.id))
 SET supplier.latestScore = evaluation.totalScore,
     supplier.latestRankCode = evaluation.rankCode,
@@ -49,11 +46,18 @@ SET supplier.latestScore = evaluation.totalScore,
     supplier.latestRankColor = evaluation.rankColor,
     supplier.lastEvaluatedAt = evaluation.createdAt,
     supplier.updatedAt = NOW()
-WHERE @current_config_id IS NOT NULL
-  AND newer.id IS NULL;
+WHERE newer.id IS NULL
+  AND EXISTS (
+    SELECT 1
+    FROM evaluation_configs AS active_config
+    WHERE active_config.id = evaluation.configId
+      AND active_config.isDefault = TRUE
+      AND active_config.isActive = TRUE
+  );
 
-SELECT @current_config_id AS retainedConfigId,
-       (SELECT COUNT(*) FROM evaluations) AS retainedEvaluations,
-       (SELECT COUNT(*) FROM evaluation_items) AS retainedEvaluationItems;
+SELECT
+  (SELECT COUNT(*) FROM evaluation_configs WHERE isDefault = TRUE AND isActive = TRUE) AS activeDefaultConfigs,
+  (SELECT COUNT(*) FROM evaluations) AS retainedEvaluations,
+  (SELECT COUNT(*) FROM evaluation_items) AS retainedEvaluationItems;
 
 COMMIT;
